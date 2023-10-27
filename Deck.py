@@ -1,6 +1,4 @@
-import json
 import random
-
 import pygame.image
 
 
@@ -54,25 +52,15 @@ class PlayerDeck:
 
         return f"{info[0:]}"
 
-    def make_starting_deck(self):
-        with open("cities.json") as f:
-            data = json.load(f)
-
-        for city_info in data:
-            city_card = CityCard(city_info["name"], pygame.image.load(city_info["image"]), city_info["x"], city_info["y"])
+    def make_starting_deck(self, cities):
+        for city_info in cities.values():
+            city_card = CityCard(city_info.name, pygame.image.load(city_info.image), city_info.x, city_info.y)
             self.deck.append(city_card)
 
     def shuffle(self):
         random.shuffle(self.deck)
 
-    def draw(self, player, player_count):
-        if int(player_count) == 2:
-            number = 4
-        elif int(player_count) == 3:
-            number = 3
-        else:
-            number = 2
-
+    def draw(self, player, number):
         player.cards.extend(self.deck[0:number])
         while number > 0:
             self.deck.pop(0)
