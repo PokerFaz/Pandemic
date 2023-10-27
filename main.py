@@ -49,30 +49,25 @@ board.add_connections()
 
 # CREATING THE DECK
 player_deck = PlayerDeck()
-player_deck.make_starting_deck()
+player_deck.make_starting_deck(board.cities)
 player_deck.shuffle()
 print(player_deck)
 
 # DEALING CARDS TO ALL THE PLAYERS
 for player in players:
-    player_deck.draw(player, board.player_count)
+    player_deck.draw(player, 4 if int(board.player_count) == 2 else (3 if int(board.player_count) == 3 else 2))
     print(player)
     print(player_deck)
 
-# DRAWING THE INITIAL POSITION OF THE BOARD AND THE PLAYER
-board.draw(screen)
-players.draw(screen)
-pygame.display.flip()
 
 run = True
 # GAME LOOP
 while run:
     for player in players:
-        action_counter = 4
-        screen.blit(player.image, (20, 20))
+        board.draw_current_board_position(screen, player, players)
         pygame.display.flip()
 
-        while action_counter > 0:
+        while player.moves > 0:
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -82,23 +77,20 @@ while run:
                 if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and board.action_menu_open is False:
                     mouse_x, mouse_y = pygame.mouse.get_pos()
 
-                    # CHECKING TO SEE IF THE PLAYER WANTS TO OPEN THE ACTION MENU
+                    # CHECKING TO SEE IF THE PLAYER TRIES TO OPEN THE ACTION MENU
                     if mouse_x in range(0, 1500) and mouse_y in range(780, 800):
                         board.draw_action_menu(screen)
-                        board.draw_actions(screen)
+                        board.draw_action_icons(screen)
                         pygame.display.flip()
 
-                    # CHECKING IF THE PLAYER WANTS TO MOVE TO ANOTHER CITY
+                    # CHECKING IF THE PLAYER TRIES TO MOVE TO ANOTHER CITY
                     for city in board.cities:
-                        distance = math.sqrt(
-                            (mouse_x - board.cities[city].x) ** 2 + (mouse_y - board.cities[city].y) ** 2)
-                        if distance <= c.RADIUS_OF_CIRCLE and board.graph.has_edge(board.cities[city],
-                                                                                   board.cities[player.city]):
-                            player.move(board.cities[city].x, board.cities[city].y)
+                        distance = math.sqrt((mouse_x - board.cities[city].x) ** 2 + (mouse_y - board.cities[city].y) ** 2)
+                        if distance <= c.RADIUS_OF_CIRCLE and (board.graph.has_edge(board.cities[city], board.cities[player.city])
+                                                               or (board.cities[city].has_research_station and board.cities[player.city].has_research_station)):
+                            player.move(board.cities[city].x, board.cities[city].y, city)
                             board.draw_current_board_position(screen, player, players)
-                            player.city = city
                             pygame.display.flip()
-                            action_counter -= 1
 
                 # ACTIONS POSSIBLE WITH MENU ON
                 if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and board.action_menu_open is True:
@@ -111,10 +103,19 @@ while run:
                         board.draw_current_board_position(screen, player, players)
                         pygame.display.flip()
 
-                    # CHECKING IF THE PLAYER HAS PRESSED A BUTTON
-                    for button in board.button_list:
+                    # CHECKING IF THE PLAYER HAS PRESSED AN ACTION BUTTON
+                    for button in board.action_button_list:
                         if button.is_clicked(mouse_x, mouse_y):
-                            if button.name == "Hand":
+                            if button.info == "Hand":
                                 board.draw_hand(screen, player, players)
+                                board.action_menu_open = False
+                                pygame.display.flip()
                                 break
+                            if button.info == "Build":
+                                board.draw_hand(screen, player, players, True)
+                                board.action_menu_open = False
+                                pygame.display.flip()
+                                break
+
+
 pygame.quit()
