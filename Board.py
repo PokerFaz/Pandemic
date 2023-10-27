@@ -1,3 +1,4 @@
+import math
 import pygame
 import networkx as nx
 import json
@@ -9,17 +10,14 @@ class Button:
     def __init__(self, x, y, name, width=0, height=0, image=None, text=None, text_size=0, color=c.RED):
         if image is not None:
             self.image = image
-            self.name = name
+            self.info = name
             self.rect = self.image.get_rect()
             self.rect.topleft = (x, y)
         else:
-            self.name = name
+            self.info = name
             self.rect = pygame.Rect(x, y, width, height)
             font = pygame.font.Font(None, text_size)
             self.text = font.render(text, True, color)
-
-    def __str__(self):
-        print(f"{self.name}, {self.rect}, {self.rect.topleft}")
 
     def draw_button(self, screen, color=c.GRAY):
         pygame.draw.rect(screen, color, self.rect)
@@ -36,24 +34,18 @@ class Button:
 
 
 class City:
-    def __init__(self, name, color, x, y, is_player_here=False, number_of_diseases=0):
+    def __init__(self, name, color, image, x, y, has_research_station, number_of_diseases=0):
         self.name = name
         self.color = color
-        self.is_player_here = is_player_here
+        self.image = image
         self.number_of_diseases = number_of_diseases
+        self.has_research_station = has_research_station
         self.x = x
         self.y = y
 
     def __str__(self):
         return (f"{self.name} - Color: {self.color}, "
-                f"Player Location: {self.is_player_here}, "
                 f"Diseases: {self.number_of_diseases}")
-
-    def add_player(self):
-        self.is_player_here = True
-
-    def remove_player(self):
-        self.is_player_here = False
 
     def add_diseases(self, number):
         if self.number_of_diseases + number < 3:
@@ -68,10 +60,14 @@ class City:
             self.number_of_diseases = 0
 
 
-def write(screen, text, text_size, x, y, color=c.RED):
+def write(screen, text, text_size, x, y, color=c.RED, has_background=False):
     font = pygame.font.Font(None, text_size)
-    text = font.render(text, True, color)
+    text = font.render(text, True, color, c.WHITE if has_background else None)
     screen.blit(text, (x, y))
+
+
+def draw_image(screen, image, coordinates):
+    screen.blit(image, coordinates)
 
 
 class Board:
@@ -83,7 +79,7 @@ class Board:
         self.outbreaks_counter = 0
         self.infection_rate_counter = 0
         self.action_menu_open = False
-        self.button_list = []
+        self.action_button_list = []
 
     def add_cities(self):
         with open("cities.json") as f:
@@ -91,8 +87,8 @@ class Board:
 
         # INITIALIZING THE CITIES
         for city_info in data:
-            city = City(city_info["name"], city_info["color"], city_info["x"], city_info["y"])
-
+            city = City(city_info["name"], city_info["color"], city_info["image"], city_info["x"], city_info["y"], True if city_info["name"] == "Atlanta" else False)
+            print(city)
             self.graph.add_node(city)
             self.cities[city.name] = city
 
@@ -108,12 +104,8 @@ class Board:
 
             self.graph.add_edge(city1, city2)
 
-    @staticmethod
-    def draw_image(screen, image, coordinates):
-        screen.blit(image, coordinates)
-
-    def draw(self, screen):
-        self.draw_image(screen, I.background, (0, 0))
+    def draw_board(self, screen):
+        draw_image(screen, I.background, (0, 0))
 
         # DRAWING THE EDGES OF THE GRAPH
         for city1, city2 in self.graph.edges:
@@ -135,9 +127,11 @@ class Board:
             city = self.cities[key]
             center = (city.x, city.y)
             pygame.draw.circle(screen, city.color, center, radius)
+            write(screen, f"{city.name}", 25, city.x - 15 if city.name != "Ho Chi Minh City" else city.x - 60, city.y + 15, c.GRAY if not city.has_research_station else c.BLACK, True)
 
         # DRAWING THE OUTBREAKS COUNTER
         write(screen, "Outbreaks:", 43, 20, 500, c.BLACK)
+
         write(screen, f"{self.outbreaks_counter}", 43, 187, 503, c.GREEN)
 
         # DRAWING THE INFECTION RATE MARKER
@@ -150,11 +144,11 @@ class Board:
             pygame.draw.circle(screen, c.DARK_GREEN if counter == self.outbreaks_counter else c.GREEN, (x, y), radius)
 
             if counter in range(0, 3):
-                write(screen, "2", 30, x-5, y+20, c.BLACK)
+                write(screen, "2", 30, x - 5, y + 20, c.BLACK)
             elif counter in range(3, 5):
-                write(screen, "3", 30, x-5, y+20, c.BLUE)
+                write(screen, "3", 30, x - 5, y + 20, c.BLUE)
             else:
-                write(screen, "4", 30, x-5, y+20, c.RED)
+                write(screen, "4", 30, x - 5, y + 20, c.RED)
 
             counter += 1
             x += 60
@@ -169,19 +163,23 @@ class Board:
         action_menu.fill((128, 128, 128, 220))
         screen.blit(action_menu, (0, 540))
 
-    def draw_actions(self, screen):
-        hand_button = Button(485, 550, "Hand", image=I.back_of_cities)
+    def draw_action_icons(self, screen):
+        hand_button = Button(300, 550, "Hand", image=I.back_of_cities)
         hand_button.draw_button_with_image(screen)
-        self.button_list.append(hand_button)
+        write(screen, "Hand", 40, 320, 710, c.BLACK)
+        self.action_button_list.append(hand_button)
+        build_rs_button = Button(495, 550, "Build", image=I.research_station_image)
+        build_rs_button.draw_button_with_image(screen)
+        write(screen, "Build", 40, 530, 710, c.BLACK)
+        self.action_button_list.append(build_rs_button)
 
-        write(screen, "Hand", 40, 500, 710, c.BLACK)
-
-    def draw_current_board_position(self, screen, current_player,  players):
-        self.draw(screen)
-        players.draw(screen)
+    def draw_current_board_position(self, screen, current_player, players):
+        self.draw_board(screen)
         screen.blit(current_player.image, (20, 20))
+        write(screen, f"{current_player.moves}", 60, 70, 20)
+        players.draw(screen)
 
-    def draw_hand(self, screen, player, players):
+    def draw_hand(self, screen, player, players, build=False):
         self.draw_current_board_position(screen, player, players)
         self.draw_action_menu(screen)
         hand = []
@@ -193,3 +191,56 @@ class Board:
             x += 190
 
         pygame.display.flip()
+        run = True
+        while run:
+            for event in pygame.event.get():
+
+                if event.type == pygame.QUIT:
+                    run = False
+
+                if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                    mouse_x, mouse_y = pygame.mouse.get_pos()
+                    if mouse_y not in range(540, 800):
+                        self.action_menu_open = False
+                        self.draw_current_board_position(screen, player, players)
+
+                        run = False
+                        break
+
+                    for card_button in hand:
+                        # MOVE THE PLAYER TO THE CLICKED CARD'S NAME
+                        if card_button.is_clicked(mouse_x, mouse_y) and player.city != card_button.info.city_name and build is False:
+                            player.move(card_button.info.x, card_button.info.y, card_button.info.city_name)
+                            player.cards.remove(card_button.info)
+                            self.draw_current_board_position(screen, player, players)
+
+                            run = False
+                            break
+                        # BUILD A RESEARCH STATION
+                        elif card_button.is_clicked(mouse_x, mouse_y) and player.city == card_button.info.city_name and build is True:
+                            self.cities[card_button.info.city_name].has_research_station = True
+                            player.cards.remove(card_button.info)
+                            player.moves -= 1
+                            self.draw_current_board_position(screen, player, players)
+                            run = False
+                            break
+                        # MOVE THE PLAYER ANYWHERE ON THE GRAPH
+                        elif card_button.is_clicked(mouse_x, mouse_y) and player.city == card_button.info.city_name:
+                            player.cards.remove(card_button.info)
+                            self.draw_current_board_position(screen, player, players)
+                            pygame.display.flip()
+                            while run:
+                                for event_ in pygame.event.get():
+                                    if event_.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                                        mouse_x, mouse_y = pygame.mouse.get_pos()
+
+                                        for city in self.cities:
+                                            distance = math.sqrt((mouse_x - self.cities[city].x) ** 2 + (mouse_y - self.cities[city].y) ** 2)
+                                            if distance <= c.RADIUS_OF_CIRCLE:
+                                                player.move(self.cities[city].x, self.cities[city].y, city)
+
+                                                self.draw_current_board_position(screen, player, players)
+
+                                                run = False
+                                                break
+
