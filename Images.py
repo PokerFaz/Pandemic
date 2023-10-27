@@ -1,0 +1,32 @@
+import pygame
+import Constants as c
+
+background = pygame.image.load("assets/PandemicMap.png")
+background = pygame.transform.scale(background, (c.WIDTH, c.HEIGHT))
+logo = pygame.image.load("assets/PandemicLogo.png")
+logo = pygame.transform.scale(logo, (600, 300))
+earth = pygame.image.load("assets/Starting.png")
+earth = pygame.transform.scale(earth, (c.WIDTH, c.HEIGHT))
+back_image = pygame.image.load("assets/BackOfRole.png")
+
+role_1 = pygame.image.load("assets/Scientist.png")
+role_2 = pygame.image.load("assets/Researcher.png")
+role_3 = pygame.image.load("assets/OperationsExpert.png")
+role_4 = pygame.image.load("assets/ContingencyPlanner.png")
+role_5 = pygame.image.load("assets/Dispatcher.png")
+role_6 = pygame.image.load("assets/Medic.png")
+role_7 = pygame.image.load("assets/QuarantineSpecialist.png")
+role_1_pin = pygame.image.load("assets/GrayPin.png")
+role_2_pin = pygame.image.load("assets/BrownPin.png")
+role_3_pin = pygame.image.load("assets/DarkGreenPin.png")
+role_4_pin = pygame.image.load("assets/TealPin.png")
+role_5_pin = pygame.image.load("assets/PinkPin.png")
+role_6_pin = pygame.image.load("assets/OrangePin.png")
+role_7_pin = pygame.image.load("assets/Pin.png")
+
+back_of_cities = pygame.image.load("assets/Cities/BackOfCity.png")
+back_of_cities = pygame.transform.scale(back_of_cities, (100 ,140))
+card_algiers = pygame.image.load("assets/Cities/Algiers_P.png")
+card_atlanta = pygame.image.load("assets/Cities/Atlanta_P.png")
+card_baghdad = pygame.image.load("assets/Cities/Baghdad_P.png")
+research_station_image = pygame.image.load("assets/ResearchStation.png")
