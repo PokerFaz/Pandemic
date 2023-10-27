@@ -1,5 +1,4 @@
 import pygame.sprite
-from Board import City
 
 
 class Player(pygame.sprite.Sprite):
@@ -19,7 +18,9 @@ class Player(pygame.sprite.Sprite):
             player_cards_names.append(card.city_name)
         return f"{self.name} is currently in {self.city}. They have {len(self.cards)} cards: {player_cards_names[0:]}"
 
-    def move(self, x, y):
+    def move(self, x, y, city):
         self.rect.center = (x+5, y-25)
-        print(f"Player successfully moved to {self.city} ")
+        self.city = city
+        self.moves -= 1
+        print(f"Player successfully moved to {city}")
 
