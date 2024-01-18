@@ -1,238 +1,149 @@
-from Board import Board, Button
+from Button import TextButton
+from Board import Board, write, display_image
 import pygame
 import Constants as c
 import random
-import Images as I
+import Images as i
 
 
-def write(screen, text, text_size, x, y, color=c.RED):
-    font = pygame.font.Font(None, text_size)
-    text = font.render(text, True, color)
-    screen.blit(text, (x, y))
+def display_starting_screen(screen: pygame.Surface, button):
+    display_image(screen, i.earth, (0, 0))
+    display_image(screen, i.logo, (450, 0))
 
-def draw_image(screen, image, coordinates):
-            screen.blit(image, coordinates)
+    button.display_button(screen)
 
-def draw_starting_screen(screen):
-            draw_image(screen, I.earth, (0, 0))
-            draw_image(screen, I.logo, (450, 0))
+    pygame.display.flip()
 
-            play_button = Button(c.WIDTH / 2.4, c.HEIGHT / 2, "Play", 200, 100, text="PLAY", text_size=40)
-            play_button.draw_button(screen)
 
-            pygame.display.flip()
-            run = True
-            while run:
-                for event in pygame.event.get():
-                    if event.type == pygame.QUIT:
-                        pygame.quit()
+def wait_to_continue_to_main_menu(button: TextButton):
+    run = True
+    while run:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
 
-                    if event.type == pygame.MOUSEBUTTONDOWN and event.button:
-                        mouse_x, mouse_y = pygame.mouse.get_pos()
-                        if play_button.is_clicked(mouse_x, mouse_y):
-                            run = False
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                mouse_x, mouse_y = pygame.mouse.get_pos()
+                if button.is_clicked(mouse_x, mouse_y):
+                    run = False
+                    break
+
+
+def display_main_menu(screen: pygame.Surface, buttons: [TextButton], player_size: str, difficulty: str):
+    display_image(screen, i.earth, (0, 0))
+    display_image(screen, i.logo, (450, 0))
+
+    for button in buttons[:-1]:
+        color = c.BLACK
+        if button.info == player_size or button.info == difficulty:
+            color = c.GREEN
+        button.display_button(screen, text_color=color, transparency=255)
+    buttons[-1].display_button(screen)
+
+    write(screen, "Number of players:", 72, c.WIDTH / 17, c.HEIGHT / 2.3)
+    write(screen, "Difficulty:", 72, c.WIDTH / 1.62, c.HEIGHT / 2.3)
+
+    pygame.display.flip()
+
+
+def wait_to_continue_to_role_menu(buttons: [TextButton], board: Board) -> bool:
+    run = True
+    while run:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                mouse_x, mouse_y = pygame.mouse.get_pos()
+
+                for button in buttons:
+                    if button.is_clicked(mouse_x, mouse_y) and button.info == "Continue":
+                        if board.player_count == 0 or board.difficulty == "":
                             break
+                        else:
+                            return False
+                    elif button.is_clicked(mouse_x, mouse_y) and button.info in ("2", "3", "4"):
+                        board.player_count = int(button.info)
+                        return True
+                    elif button.is_clicked(mouse_x, mouse_y):
+                        board.difficulty = button.info
+                        return True
 
-def draw_main_menu(screen, board):
-            draw_image(screen, I.earth, (0, 0))
-            draw_image(screen, I.logo, (450, 0))
 
-            write(screen, "Number of players:", 72, c.WIDTH / 17, c.HEIGHT / 2.3)
+def get_user_input(buttons, part):
 
-            # PLAYER COUNT OPTIONS
-            player_counts = ("2", "3", "4")
-            player_count_x = c.WIDTH / 7.5
-            for count in player_counts:
-                color = c.GREEN if board.player_count == count else c.BLACK
-                write(screen, count, 72, player_count_x, c.HEIGHT / 1.8, color)
-                player_count_x += 100
+    run = True
+    while run:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
 
-            write(screen, "Difficulty:", 72, c.WIDTH / 1.62, c.HEIGHT / 2.3)
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                mouse_x, mouse_y = pygame.mouse.get_pos()
 
-            # DRAW DIFFICULTY OPTIONS
-            difficulties = ["EASY", "NORMAL", "COVID19"]
-            difficulty_x = c.WIDTH / 2
-            counter = 0
-            for diff in difficulties:
-                color = c.GREEN if board.difficulty == diff else c.BLACK
-                write(screen, diff, 58, difficulty_x, c.HEIGHT / 1.8, color)
+                for (button, button_part) in buttons:
+                    if button_part == part:
+                        if button.is_clicked(mouse_x, mouse_y) and button.info == "More roles":
+                            return 2
+                        elif button.is_clicked(mouse_x, mouse_y) and button.info == "Previous":
+                            return 1
+                        elif button.is_clicked(mouse_x, mouse_y) and button.info == "Random":
+                            current_available_roles = [button for button, button_part in buttons if
+                                                       button.info not in ("More roles", "Previous", "Random", "taken")]
+                            print([role.info for role in current_available_roles])
+                            chosen_button = random.choice(current_available_roles)
+                            print(chosen_button.info)
+                            result = chosen_button.info
+                            chosen_button.info = "taken"
+                            chosen_button.image = i.back_image
+                            chosen_button.clickable = False
+                            return result
+                        elif button.is_clicked(mouse_x, mouse_y):
+                            result = button.info
+                            button.info = "taken"
+                            button.image = i.back_image
+                            button.clickable = False
+                            return result
 
-                if counter == 0:
-                    difficulty_x += 200
-                else:
-                    difficulty_x += 260
-                counter += 1
 
-            continue_button = Button(c.WIDTH / 2.4, c.HEIGHT / 1.3, "Continue", 200, 100, text="CONTINUE", text_size=40)
-            continue_button.draw_button(screen)
+def display_role_menu(screen, player_number, buttons, part):
+    display_image(screen, i.earth, (0, 0))
+    write(screen, f"Choose Player {player_number} role:", 72, 50, 100)
 
-            pygame.display.flip()
+    for (button, button_part) in buttons:
+        if button_part == part:
+            button.display_button(screen) if button.info != "Random" else button.display_button(screen, rect_color=c.BLACK, text_color=c.WHITE)
 
-            run = True
-            while run:
-                for event in pygame.event.get():
-                    if event.type == pygame.QUIT:
-                        pygame.quit()
+    if part == 2:
+        write(screen, "Random", 60, 1263, 300, c.WHITE)
 
-                    if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                        mouse_x, mouse_y = pygame.mouse.get_pos()
+    pygame.display.flip()
 
-                        if continue_button.is_clicked(mouse_x,mouse_y) and board.player_count != 0 and board.difficulty != "":
-                            run = False
-                            break
 
-                        player_count_x = c.WIDTH / 7.5
-                        for count in player_counts:
-                            if mouse_x in range(int(player_count_x), int(player_count_x + 25)) and mouse_y in range(
-                                    int(c.HEIGHT / 1.8), int(c.HEIGHT / 1.8 + 40)):
-                                run = False
-                                board.player_count = count
-                                draw_main_menu(screen, board)
-                            player_count_x += 100
+def display_chosen_game_options(screen, players, board):
+    display_image(screen, i.earth, (0, 0))
+    write(screen, f"Game's settings:", 60, 200, 100, c.RED)
+    write(screen, f'Difficulty: {board.difficulty}', 60, 200, 200, c.GREEN)
+    y = 300
+    counter = 1
+    for player in players:
+        write(screen, f'Players {counter} role: {player.name}', 60, 200, y, c.WHITE)
+        y += 100
+        counter += 1
 
-                        if mouse_y in range(442, 472):
-                            if mouse_x in range(754, 847):
-                                run = False
-                                board.difficulty = "EASY"
-                                draw_main_menu(screen, board)
-                            elif mouse_x in range(952, 1117):
-                                run = False
-                                board.difficulty = "NORMAL"
-                                draw_main_menu(screen, board)
-                            elif mouse_x in range(1212, 1373):
-                                run = False
-                                board.difficulty = "COVID19"
-                                draw_main_menu(screen, board)
+    start_button = TextButton(1200, 400, "start", 200, 100, text="Start?", text_size=40)
+    start_button.display_button(screen, c.GRAY)
 
-def draw_role_menu_1(screen, number, role_dict):
-            draw_image(screen, I.earth, (0, 0))
-            write(screen, f"Choose Player {number} role:", 72, 50, 100)
+    pygame.display.flip()
 
-            image_x = 25
-            counter = 0
-            role_names = ("Scientist", "Researcher", "Operations Expert", "Contingency Planner")
-            role_button_list = []
-            while counter < 4:
-                role_button = Button(image_x, 250, role_names[counter], image=tuple(role_dict.values())[counter][0])
-                role_button.draw_button_with_image(screen)
-                if tuple(role_dict.values())[counter][1] != 1:
-                    role_button_list.append(role_button)
-                else:
-                    print(f"{role_names[counter - 4]} is used")
-                image_x += 400
-                counter += 1
+    run = True
+    while run:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
 
-            print(role_dict)
-
-            more_roles_button = Button(1200, 700, "More roles", 300, 100, text="More Roles", text_size=40)
-            more_roles_button.draw_button(screen)
-
-            pygame.display.flip()
-
-            run = True
-            while run:
-                for event in pygame.event.get():
-                    if event.type == pygame.QUIT:
-                        pygame.quit()
-
-                    if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                        mouse_x, mouse_y = pygame.mouse.get_pos()
-                        for role in role_button_list:
-                            if role.is_clicked(mouse_x, mouse_y):
-                                run = False
-                                return role.info
-
-                        if more_roles_button.is_clicked(mouse_x, mouse_y):
-                            run = False
-                            name = draw_role_menu_2(screen, number, role_dict)
-                            return name
-
-def draw_role_menu_2(screen, number, role_dict):
-            draw_image(screen, I.earth, (0, 0))
-            write(screen, f"Choose Player {number} role:", 72, 50, 100)
-
-            image_x = 25
-            counter = 4
-            role_names = ("Dispatcher", "Medic", "Quarantine Specialist")
-            role_button_list = []
-            while counter < 7:
-                role_button = Button(image_x, 250, role_names[counter - 4], image=tuple(role_dict.values())[counter][0])
-                role_button.draw_button_with_image(screen)
-                if tuple(role_dict.values())[counter][1] != 1:
-                    role_button_list.append(role_button)
-                else:
-                    print(f"{role_names[counter - 4]} is used")
-
-                image_x += 400
-                counter += 1
-
-            random_card_button = Button(1225, 250, "Random", 242, 342, text="?", text_size=100, color=c.WHITE)
-            random_card_button.draw_button(screen, c.BLACK)
-
-            role_button_list.append(random_card_button)
-
-            write(screen, "Random", 60, 1263, 300, c.WHITE)
-
-            previous_button = Button(0, 700, "Previous", 300, 100, text="Previous Roles", text_size=40)
-            previous_button.draw_button(screen)
-
-            pygame.display.flip()
-
-            run = True
-            while run:
-                for event in pygame.event.get():
-                    if event.type == pygame.QUIT:
-                        pygame.quit()
-
-                    if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                        mouse_x, mouse_y = pygame.mouse.get_pos()
-
-                        if previous_button.is_clicked(mouse_x, mouse_y):
-                            run = False
-                            name = draw_role_menu_1(screen, number, role_dict)
-                            return name
-
-                        for role in role_button_list:
-                            if role.info != "Random":
-                                 if role.is_clicked(mouse_x, mouse_y):
-                                    run = False
-                                    return role.name
-                            elif role.is_clicked(mouse_x, mouse_y):
-                                run = False
-                                current_available_roles = []
-
-                                for key in role_dict:
-                                    image = pygame.image.load("assets/BackOfRole.png")
-                                    print(image)
-                                    if role_dict[key][1] != 1:
-                                        current_available_roles.append(key)
-
-                                number = random.randint(0, len(current_available_roles) - 1)
-                                return current_available_roles[number]
-
-def draw_chosen_game_options(screen, players, board):
-            draw_image(screen, I.earth, (0, 0))
-            write(screen, f"Game's settings:", 60, 200, 100, c.RED)
-            write(screen, f'Difficulty: {board.difficulty}', 60, 200, 200, c.GREEN)
-            y = 300
-            counter = 1
-            for player in players:
-                write(screen, f'Players {counter} role: {player.name}', 60, 200, y, c.WHITE)
-                y += 100
-                counter += 1
-
-            start_button = Button(1200, 400, "start", 200, 100, text="Start?", text_size=40)
-            start_button.draw_button(screen, c.GRAY)
-            pygame.display.flip()
-
-            run = True
-            while run:
-                for event in pygame.event.get():
-                    if event.type == pygame.QUIT:
-                        pygame.quit()
-
-                    if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                        mouse_x, mouse_y = pygame.mouse.get_pos()
-                        if start_button.is_clicked(mouse_x, mouse_y):
-                            run = False
-                            break
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                mouse_x, mouse_y = pygame.mouse.get_pos()
+                if start_button.is_clicked(mouse_x, mouse_y):
+                    run = False
+                    break

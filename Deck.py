@@ -3,42 +3,37 @@ import pygame.image
 
 
 class Card:
-    def __init__(self, card_type):
+    def __init__(self, card_type, name):
         self.card_type = card_type
+        self.name = name
 
     def __str__(self):
         return f"Type: {self.card_type}"
 
 
 class CityCard(Card):
-    def __init__(self, city_name, image, x, y):
-        super().__init__("City Card")
-        self.city_name = city_name
+    def __init__(self, city, image):
+        super().__init__("City Card", city)
         self.image = image
-        self.x = x
-        self.y = y
         self.rect = self.image.get_rect()
-
 
 
 class EpidemicCard(Card):
     def __init__(self):
-        super().__init__("Epidemic Card")
+        super().__init__("Epidemic Card", "epidemic_card")
 
 
 class EventCard(Card):
     def __init__(self, name):
-        super().__init__("Event Card")
-        self.name = name
+        super().__init__("Event Card", name)
 
 
 class InfectionCard(Card):
     def __init__(self, city):
-        super().__init__("Infection Card")
-        self.city = city
+        super().__init__("Infection Card", city)
 
 
-class PlayerDeck:
+class Deck:
     def __init__(self):
         self.deck = []
 
@@ -46,26 +41,33 @@ class PlayerDeck:
         return len(self.deck)
 
     def __str__(self):
-        info = []
-        for card in self.deck:
-            info.append(card.city_name)
+        info = [card.name for card in self.deck]
+        return str(info)
 
-        return f"{info[0:]}"
-
-    def make_starting_deck(self, cities):
-        for city_info in cities.values():
-            city_card = CityCard(city_info.name, pygame.image.load(city_info.image), city_info.x, city_info.y)
-            self.deck.append(city_card)
+    def add_cards(self, cards):
+        self.deck.extend(cards)
 
     def shuffle(self):
         random.shuffle(self.deck)
 
-    def draw(self, player, number):
-        player.cards.extend(self.deck[0:number])
-        while number > 0:
-            self.deck.pop(0)
-            number -= 1
+    def remove_top_cards(self, number_of_removed_cards):
+        self.deck = self.deck[number_of_removed_cards:]
+
+    def get_cards(self, number):
+        return self.deck[:number]
 
 
-class InfectionDeck:
-    pass
+class PlayerDeck(Deck):
+    def __init__(self, cities):
+        super().__init__()
+        for city_info in cities.values():
+            city_card = CityCard(city_info.name, pygame.image.load(city_info.image))
+            self.deck.append(city_card)
+
+
+class InfectionDeck(Deck):
+    def __init__(self, cities):
+        super().__init__()
+        for city_info in cities.values():
+            city_card = InfectionCard(city_info.name)
+            self.deck.append(city_card)
