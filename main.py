@@ -41,7 +41,6 @@ role_dict = {
 
 role_buttons = button_factory.create_roles_menu_buttons(role_dict)  # list of (Button, int) where int is the related to what part will be the button displayed
 offset_x = 0
-print(role_buttons)
 # PICKING AND CREATING THE PLAYERS
 while player_number <= int(board.player_count):
     Menu.display_role_menu(screen, player_number, role_buttons, 1)
