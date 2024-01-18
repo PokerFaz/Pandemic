@@ -98,9 +98,8 @@ for player in players:
     player_deck.remove_top_cards(n)
     players_discard_pile.add_cards(drawn_cards)
 
-    print(player)
-    print(player_deck)
 
+player_deck.prepare_deck(board.difficulty)
 run = True
 # GAME LOOP
 while run:
