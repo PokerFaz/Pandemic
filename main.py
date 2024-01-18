@@ -52,12 +52,12 @@ while player_number <= int(board.player_count):
 
     print(role)
     player_image = pygame.transform.scale(role_dict[role][1], (c.LENGTH_PLAYER, c.HEIGHT_PLAYER))
-    player = Player(role, player_image, 285 + offset_x, 250)
+    player = Player(role, player_image, 285 + offset_x, 250, offset_x)
     print(player)
     players.add(player)
 
     player_number += 1
-    offset_x -= 10
+    offset_x -= 5
 
 # MAKING THE FINAL SCREEN BEFORE THE START OF THE GAME
 Menu.display_chosen_game_options(screen, players, board)
