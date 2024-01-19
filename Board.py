@@ -74,10 +74,7 @@ class City:
             pass  # WRITE AN OUTBREAK!!!!!!!!!!!!!!
 
     def remove_diseases(self, number, color):
-        if self.diseases[color] - number > 0:
-            self.diseases[color] = self.diseases[color] - number
-        else:
-            self.diseases[color] = 0
+        self.diseases[color] = max(self.diseases[color] - number, 0)
 
 
 class Board:
@@ -237,6 +234,7 @@ class GUI:
 
         write(self.screen, "Hand", 40, 320, 710, c.BLACK)
         write(self.screen, "Build", 40, 530, 710, c.BLACK)
+        write(self.screen, "Treat", 40, 755, 710, c.BLACK)
 
     def display_current_board_position(self, current_player: Player, players: pygame.sprite.Group):
         self.display_board()

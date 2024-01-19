@@ -132,7 +132,8 @@ class ButtonFactory:
     def create_action_buttons():
         result_hand_button = [
             ImageButton(300, 550, "Hand", image=i.back_of_cities),
-            ImageButton(495, 550, "Build", image=i.research_station_image)
+            ImageButton(495, 550, "Build", image=i.research_station_image),
+            ImageButton(720, 555, "Treat", image=i.treat_image)
         ]
 
         return result_hand_button
