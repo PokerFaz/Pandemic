@@ -54,7 +54,7 @@ class Deck:
         self.deck = self.deck[number_of_removed_cards:]
 
     def get_cards(self, number: int):
-        return self.deck[:number]
+        return [city.name for city in self.deck[:number]]
 
 
 class PlayerDeck(Deck):

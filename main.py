@@ -84,9 +84,9 @@ infection_deck.remove_top_cards(9)
 infection_discard_pile.add_cards(target_cities)
 
 for i in range(9):
-    city_color = board.cities[target_cities[i].name].color
+    city_color = board.cities[target_cities[i]].color
     diseases = 3 if i < 3 else (2 if i < 6 else 1)
-    board.cities[target_cities[i].name].add_diseases(diseases, city_color)
+    board.cities[target_cities[i]].add_diseases(diseases, city_color)
 
 # DEALING CARDS TO ALL THE PLAYERS
 n = 4 if int(board.player_count) == 2 else (3 if int(board.player_count) == 3 else 2)
@@ -94,7 +94,7 @@ n = 4 if int(board.player_count) == 2 else (3 if int(board.player_count) == 3 el
 for player in players:
     drawn_cards = player_deck.get_cards(n)
 
-    player.draw([city.name for city in drawn_cards])
+    player.draw(drawn_cards)
     player_deck.remove_top_cards(n)
     players_discard_pile.add_cards(drawn_cards)
 
@@ -152,7 +152,7 @@ while run:
                                     game.display_player_hand(card_buttons)
                                     game.handle_button_action(card_buttons, button.info, player, players)
                                     game.action_menu_open = False
-
+        player.draw(player_deck.get_cards(2))
         player.replenish_moves()
 
 pygame.quit()
