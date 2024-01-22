@@ -1,2 +1,2 @@
 # Pandemic
-FMI python course project
+Python course project
