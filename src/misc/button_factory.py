@@ -1,65 +1,9 @@
-import pygame
-import Constants as c
-import Images as i
-
-
-class Button:
-    def __init__(self, x: int, y: int, name: str):
-        self.info = name
-        self.clickable = True
-        self.x = x
-        self.y = y
-
-    def display_button(self, screen: pygame.Surface, *args):
-        pass
-
-    def is_clicked(self, mouse_x: int, mouse_y: int):
-        if not self.clickable:
-            return False
-
-        if self.is_point_inside(mouse_x, mouse_y):
-            return True
-
-        return False
-
-    def is_point_inside(self, x: int, y: int):
-        pass
-
-
-class ImageButton(Button):
-    def __init__(self, x: int, y: int, name: str, image: pygame.image):
-        super().__init__(x, y, name)
-        self.image = image
-        self.info = name
-        self.rect = self.image.get_rect()
-        self.rect.topleft = (x, y)
-
-    def display_button(self, screen: pygame.Surface, *args):
-        screen.blit(self.image, self.rect.topleft)
-
-    def is_point_inside(self, x: int, y: int):
-        return self.rect.collidepoint(x, y)
-
-
-class TextButton(Button):
-    def __init__(self, x: int, y: int, name: str, width: int, height: int, text: str, text_size: int):
-        super().__init__(x, y, name)
-        self.rect = pygame.Rect(x, y, width, height)
-        self.text_size = text_size
-        self.text = text
-
-    def display_button(self, screen: pygame.Surface, rect_color: tuple[int, int, int] = c.GRAY, text_color: tuple[int, int, int] = c.RED, transparency: int = 0):
-        if transparency == 0:
-            pygame.draw.rect(screen, rect_color, self.rect)
-
-        font = pygame.font.Font(None, self.text_size)
-        text = font.render(self.text, True, text_color)
-
-        text_rect = text.get_rect(center=self.rect.center)
-        screen.blit(text, text_rect)
-
-    def is_point_inside(self, x: int, y: int):
-        return self.rect.collidepoint(x, y)
+import src.misc.constants as c
+import src.misc.images as i
+import pygame.image
+from src.models.city import City
+from src.models.buttons.image_button import ImageButton
+from src.models.buttons.text_button import TextButton
 
 
 class ButtonFactory:
@@ -70,7 +14,7 @@ class ButtonFactory:
         return play_button
 
     @staticmethod
-    def create_main_menu_buttons():
+    def create_main_menu_buttons() -> list[TextButton]:
         player_count_x = c.WIDTH / 7.5
         result = []
 
@@ -104,7 +48,7 @@ class ButtonFactory:
         return result
 
     @staticmethod
-    def create_roles_menu_buttons(role_dict: dict):
+    def create_roles_menu_buttons(role_dict: dict[str: (pygame.image, pygame.image)]) -> list[tuple[ImageButton, int] | tuple[TextButton, int]]:
         image_x = 25
         counter = 0
         role_menu_part = 1
@@ -129,7 +73,7 @@ class ButtonFactory:
         return buttons
 
     @staticmethod
-    def create_action_buttons():
+    def create_action_buttons() -> list[ImageButton]:
         result_hand_button = [
             ImageButton(300, 550, "Hand", image=i.back_of_cities),
             ImageButton(495, 550, "Build", image=i.research_station_image),
@@ -139,13 +83,15 @@ class ButtonFactory:
         return result_hand_button
 
     @staticmethod
-    def create_city_buttons(cities, player_cards) -> list[Button]:
-        city_buttons = []
-
+    def create_city_buttons(cities: dict[str: City], player_cards: list[str]) -> list[ImageButton]:
         x = 5
-        for card in player_cards:
-            card_button = ImageButton(x, 550, card, image=pygame.image.load(cities[card].image))
-            city_buttons.append(card_button)
-            x += 190
+        city_buttons = [ImageButton(x + 190 * index, 550, card, image=pygame.image.load(cities[card].image)) for index, card in enumerate(player_cards, start=0)]
 
         return city_buttons
+
+    @staticmethod
+    def create_disease_removal_options_buttons(available_choices: list[tuple[str, int]]) -> list[TextButton]:
+        x = 300
+        result = [TextButton(x + 250 * index, 650, color, 80, 80, f'{str(number_of_diseases)}', 50) for index, (color, number_of_diseases) in enumerate(available_choices)]
+
+        return result

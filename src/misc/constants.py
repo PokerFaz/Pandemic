@@ -1,3 +1,6 @@
+from typing import NewType
+
+
 WIDTH = 1500
 HEIGHT = 800
 GREEN = (0, 255, 0)
@@ -14,4 +17,4 @@ LENGTH_PLAYER = 40
 RADIUS_OF_CIRCLE = 10
 NUMBER_OF_PLAYERS = ("2", "3", "4")
 DIFFICULTIES = ("EASY", "NORMAL", "COVID19")
-
+color = NewType("color", tuple[int, int, int])

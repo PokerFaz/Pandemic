@@ -1,6 +1,6 @@
 import os
 import pygame
-import Constants as c
+from src.misc import constants as c
 
 background = pygame.image.load(os.path.join("assets", "PandemicMapV2.png"))
 background = pygame.transform.scale(background, (c.WIDTH, c.HEIGHT))

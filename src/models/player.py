@@ -2,7 +2,7 @@ import pygame.sprite
 
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self, name, player_image, x, y, offset_by_x):
+    def __init__(self, name: str, player_image: pygame.image, x: int, y: int, offset_by_x: int):
         super().__init__()
         self.name = name
         self.city = "Atlanta"
@@ -22,10 +22,8 @@ class Player(pygame.sprite.Sprite):
         self.moves -= 1
         print(f"Player successfully moved to {city}")
 
-    def draw(self, cards):
+    def draw(self, cards: list[str]):
         self.cards.extend(cards)
 
     def replenish_moves(self):
         self.moves = 4
-
-

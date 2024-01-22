@@ -1,28 +1,21 @@
-import math
-import os
-from Player import Player
-from Button import Button
-import networkx.classes.reportviews
 import pygame
-import networkx as nx
-import json
-import Constants as c
-import Images as i
+import networkx
+from src.models.buttons.text_button import TextButton
+from src.models.buttons.image_button import ImageButton
+from src.models.city import from_str_to_color
+from src.models.board import Board
+from src.models.city import City
+from src.models.board import distance_between_click_and_city
+from src.misc import constants as c
+from src.models.buttons.button import Button
+from src.models.player import Player
+from src.misc.images import background
 
 
-def color_map(color_name):
-    color_mapping = {
-        "Red": c.RED,
-        "Yellow": c.YELLOW,
-        "Blue": c.BLUE,
-        "Black": c.BLACK
-    }
-
-    return color_mapping.get(color_name)
-
-
-def distance_between_click_and_city(m_x, m_y, city_x, city_y):
-    return math.sqrt((m_x - city_x) ** 2 + (m_y - city_y) ** 2)
+def iterate_diseases(city_diseases):
+    for color, number in city_diseases.items():
+        if number > 0:
+            yield number, color
 
 
 def write(screen, text, text_size, x, y, color=c.RED, has_background=False):
@@ -33,90 +26,6 @@ def write(screen, text, text_size, x, y, color=c.RED, has_background=False):
 
 def display_image(screen, image, coordinates):
     screen.blit(image, coordinates)
-
-
-def iterate_diseases(city_diseases):
-    for color, number in city_diseases.items():
-        if number > 0:
-            yield number, color
-
-
-def load_json_from_file(file_name):
-    with open(file_name) as f:
-        data = json.load(f)
-    return data
-
-
-class City:
-    def __init__(self, name, color, image, x, y, has_research_station):
-        self.name = name
-        self.color = color_map(color)
-        self.image = image
-        self.diseases = {
-            c.RED: 0,
-            c.BLUE: 0,
-            c.YELLOW: 0,
-            c.BLACK: 0
-        }
-        self.has_research_station = has_research_station
-        self.x = x
-        self.y = y
-
-    def __str__(self):
-        return (f"{self.name} - Color: {self.color}, "
-                f"Diseases: {self.diseases}")
-
-    def add_diseases(self, number, color):
-        if self.diseases[color] + number < 4:
-            self.diseases[color] = self.diseases[color] + number
-            print(f"Added to {self.name} {number} cubes")
-        else:
-            pass  # WRITE AN OUTBREAK!!!!!!!!!!!!!!
-
-    def remove_diseases(self, number, color):
-        self.diseases[color] = max(self.diseases[color] - number, 0)
-
-
-class Board:
-    def __init__(self):
-        self.cities = {}
-        self.graph = nx.Graph()
-        self.player_count = 0
-        self.difficulty = ""
-        self.outbreaks_counter = 0
-        self.infection_rate_counter = 0
-
-    def add_cities(self):
-        data = load_json_from_file("cities.json")
-
-        # INITIALIZING THE CITIES
-        for city_data in data:
-            image = os.path.join(*city_data["image"].split(","))
-
-            city = City(city_data["name"], city_data["color"], image, city_data["x"], city_data["y"],
-                        True if city_data["name"] == "Atlanta" else False)
-
-            self.graph.add_node(city)
-            self.cities[city.name] = city
-
-    def add_connections(self):
-        connections = load_json_from_file("connections.json")
-
-        # ADDING THE CONNECTIONS IN THE GRAPH
-        for connection in connections:
-            city1 = connection["city1"]
-            city2 = connection["city2"]
-
-            self.graph.add_edge(city1, city2)
-
-    def has_edge(self, chosen_city: str, player_city: str) -> bool:
-        return self.graph.has_edge(chosen_city, player_city)
-
-    def get_city_at_coordinates(self, mouse_x: int, mouse_y: int) -> str | None:
-        for city in self.cities:
-            if distance_between_click_and_city(mouse_x, mouse_y, self.cities[city].x,
-                                               self.cities[city].y) < c.RADIUS_OF_CIRCLE:
-                return city
 
 
 class GUI:
@@ -139,13 +48,16 @@ class GUI:
             iterator = iterate_diseases(city.diseases)
 
             number, color = next(iterator)
-            write(self.screen, str(number), 40, city.x - 30, city.y - 15, color if color != c.YELLOW else c.DARK_YELLOW)
+            write(self.screen, str(number), 40, city.x - 30, city.y - 15,
+                  from_str_to_color(color) if color != "Yellow" else c.DARK_YELLOW)
 
             number, color = next(iterator)
-            write(self.screen, str(number), 40, city.x + 10, city.y - 15, color if color != c.YELLOW else c.DARK_YELLOW)
+            write(self.screen, str(number), 40, city.x + 10, city.y - 15,
+                  from_str_to_color(color) if color != "Yellow" else c.DARK_YELLOW)
 
             number, color = next(iterator)
-            write(self.screen, str(number), 40, city.x - 50, city.y - 15, color if color != c.YELLOW else c.DARK_YELLOW)
+            write(self.screen, str(number), 40, city.x - 50, city.y - 15,
+                  from_str_to_color(color) if color != "Yellow" else c.DARK_YELLOW)
 
         except StopIteration:
             pass
@@ -212,7 +124,7 @@ class GUI:
         pygame.draw.rect(self.screen, c.GRAY, (0, 780, 1500, 20), border_top_left_radius=5, border_top_right_radius=5)
 
     def display_board(self):
-        display_image(self.screen, i.background, (0, 0))
+        display_image(self.screen, background, (0, 0))
 
         self.display_connecting_lines(self.board.graph.edges)
         self.display_cities(self.board.cities)
@@ -250,7 +162,15 @@ class GUI:
 
         pygame.display.flip()
 
-    def pick_a_card(self, card_buttons: list[Button]) -> str | None:
+    def display_disease_choices(self, available_choices: list[TextButton]):
+        self.display_action_menu()
+        write(self.screen, "Pick what disease you want to treat", 50, c.WIDTH / 3.2, 580)
+
+        for index in range(len(available_choices)):
+            rectangle_color = from_str_to_color(available_choices[index].info)
+            available_choices[index].display_button(self.screen, rect_color=rectangle_color, text_color=c.WHITE)
+
+    def pick_a_card(self, card_buttons: list[TextButton | ImageButton]) -> str | None:
         run = True
         while run:
             for event in pygame.event.get():
@@ -279,12 +199,14 @@ class GUI:
                     return city
 
     @staticmethod
-    def find_pressed_card(mouse_x, mouse_y, card_buttons):
-        for button in card_buttons:
+    def find_pressed_button(mouse_x: int, mouse_y: int, buttons: list[TextButton | ImageButton]) -> TextButton | ImageButton | None:
+        for button in buttons:
             if button.is_clicked(mouse_x, mouse_y):
-                return button.info
+                return button
 
-    def handle_button_action(self, card_buttons, action, player, players):
+        return None
+
+    def handle_button_action(self, card_buttons: list[TextButton | Button], action: str, player: Player, players: pygame.sprite.Group):
         while True:
             mouse_x, mouse_y = self.get_next_input()
 
@@ -294,7 +216,8 @@ class GUI:
                 pygame.display.flip()
                 break
 
-            pressed_card_name = self.find_pressed_card(mouse_x, mouse_y, card_buttons)
+            pressed_card_button = self.find_pressed_button(mouse_x, mouse_y, card_buttons)
+            pressed_card_name = pressed_card_button.info
 
             if pressed_card_name is not None:
                 if pressed_card_name == player.city and action == "Hand":
