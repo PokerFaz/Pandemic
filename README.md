@@ -1,2 +1,2 @@
 # Pandemic
-Python course project
+Python project
