@@ -18,7 +18,7 @@ class Board:
         self.infection_rate_counter = 0
 
     def add_cities(self):
-        data = load_json_from_file("cities.json")
+        data = load_json_from_file(os.path.join("src", "misc", "cities.json"))
 
         # INITIALIZING THE CITIES
         for city_data in data:
@@ -31,7 +31,7 @@ class Board:
             self.cities[city.name] = city
 
     def add_connections(self):
-        connections = load_json_from_file("connections.json")
+        connections = load_json_from_file(os.path.join("src", "misc", "connections.json"))
 
         # ADDING THE CONNECTIONS IN THE GRAPH
         for connection in connections:
