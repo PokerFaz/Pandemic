@@ -128,7 +128,7 @@ class Menu:
             player_number += 1
             offset_x -= 5
 
-    def display_role_menu(self, player_number: int, buttons: list[ImageButton | TextButton], part):
+    def display_role_menu(self, player_number: int, buttons: list[tuple[ImageButton, int] | tuple[TextButton, int]], part):
         display_image(self.screen, i.earth, (0, 0))
         write(self.screen, f"Choose Player {player_number} role:", 72, 50, 100)
 
@@ -144,7 +144,7 @@ class Menu:
         pygame.display.flip()
 
     @staticmethod
-    def get_user_input(buttons: list[ImageButton | TextButton], part: int) -> int | str:
+    def get_user_input(buttons: list[tuple[ImageButton, int] | tuple[TextButton, int]], part: int) -> int | str:
         run = True
         while run:
             for event in pygame.event.get():
