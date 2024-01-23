@@ -3,13 +3,14 @@ import networkx
 from src.models.buttons.text_button import TextButton
 from src.models.buttons.image_button import ImageButton
 from src.models.city import from_str_to_color
-from src.models.board import Board
 from src.models.city import City
 from src.misc import constants as c
 from src.models.buttons.button import Button
 from src.models.player import Player
 from src.misc.images import background
-from src.misc.utility import distance_between_two_points
+from src.controllers.game import Game
+from src.misc.button_factory import ButtonFactory
+from src.models.board import Board
 
 
 def iterate_diseases(city_diseases):
@@ -29,8 +30,7 @@ def display_image(screen, image, coordinates):
 
 
 class GUI:
-    def __init__(self, screen: pygame.Surface, board: Board):
-        self.board = board
+    def __init__(self, screen: pygame.Surface):
         self.screen = screen
         self.action_menu_open = False
         self.action_button_list = []
@@ -40,7 +40,9 @@ class GUI:
         while True:
             mouse_x, mouse_y = pygame.mouse.get_pos()
             for event in pygame.event.get():
-                if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                     return mouse_x, mouse_y
 
     def display_diseases(self, city: City):
@@ -62,26 +64,26 @@ class GUI:
         except StopIteration:
             pass
 
-    def display_connecting_lines(self, edges: networkx.classes.reportviews.EdgeView):
+    def display_connecting_lines(self, edges: networkx.classes.reportviews.EdgeView, cities: dict[str: City]):
         for city1, city2 in edges:
             if city1 == "San Francisco" and city2 == "Tokyo":
-                pygame.draw.line(self.screen, c.BLACK, (self.board.cities[city1].x, self.board.cities[city1].y),
+                pygame.draw.line(self.screen, c.BLACK, (cities[city1].x, cities[city1].y),
                                  (0, 200), 2)
-                pygame.draw.line(self.screen, c.BLACK, (self.board.cities[city2].x, self.board.cities[city2].y),
+                pygame.draw.line(self.screen, c.BLACK, (cities[city2].x, cities[city2].y),
                                  (1500, 251), 2)
             elif city1 == "San Francisco" and city2 == "Manila":
-                pygame.draw.line(self.screen, c.BLACK, (self.board.cities[city1].x, self.board.cities[city1].y),
+                pygame.draw.line(self.screen, c.BLACK, (cities[city1].x, cities[city1].y),
                                  (0, 300), 2)
-                pygame.draw.line(self.screen, c.BLACK, (self.board.cities[city2].x, self.board.cities[city2].y),
+                pygame.draw.line(self.screen, c.BLACK, (cities[city2].x, cities[city2].y),
                                  (1500, 420), 2)
             elif city1 == "Los Angeles" and city2 == "Sydney":
-                pygame.draw.line(self.screen, c.BLACK, (self.board.cities[city1].x, self.board.cities[city1].y),
+                pygame.draw.line(self.screen, c.BLACK, (cities[city1].x, cities[city1].y),
                                  (0, 362), 2)
-                pygame.draw.line(self.screen, c.BLACK, (self.board.cities[city2].x, self.board.cities[city2].y),
+                pygame.draw.line(self.screen, c.BLACK, (cities[city2].x, cities[city2].y),
                                  (1500, 630), 2)
             else:
-                pygame.draw.line(self.screen, c.BLACK, (self.board.cities[city1].x, self.board.cities[city1].y),
-                                 (self.board.cities[city2].x, self.board.cities[city2].y), 2)
+                pygame.draw.line(self.screen, c.BLACK, (cities[city1].x, cities[city1].y),
+                                 (cities[city2].x, cities[city2].y), 2)
 
     def display_cities(self, cities: dict):
         radius = c.RADIUS_OF_CIRCLE
@@ -94,12 +96,12 @@ class GUI:
                   city.y + 15, c.GRAY if not city.has_research_station else c.BLACK, True)
             self.display_diseases(city)
 
-    def display_outbreaks(self):
+    def display_outbreaks(self, outbreaks_counter: int):
         write(self.screen, "Outbreaks:", 43, 20, 500, c.BLACK)
 
-        write(self.screen, f"{self.board.outbreaks_counter}", 43, 187, 503, c.GREEN)
+        write(self.screen, f"{outbreaks_counter}", 43, 187, 503, c.GREEN)
 
-    def display_infection_rate(self):
+    def display_infection_rate(self, outbreaks_counter: int):
         write(self.screen, "Infection rate", 50, 1170, 30, c.BLACK)
 
         counter = 0
@@ -107,7 +109,7 @@ class GUI:
         y = 100
 
         while counter < 7:
-            pygame.draw.circle(self.screen, c.DARK_GREEN if counter == self.board.outbreaks_counter else c.GREEN,
+            pygame.draw.circle(self.screen, c.DARK_GREEN if counter == outbreaks_counter else c.GREEN,
                                (x, y), c.RADIUS_OF_CIRCLE)
 
             if counter in range(0, 3):
@@ -123,13 +125,13 @@ class GUI:
     def display_action_tab_opener(self):
         pygame.draw.rect(self.screen, c.GRAY, (0, 780, 1500, 20), border_top_left_radius=5, border_top_right_radius=5)
 
-    def display_board(self):
+    def display_board(self, board: Board):
         display_image(self.screen, background, (0, 0))
 
-        self.display_connecting_lines(self.board.graph.edges)
-        self.display_cities(self.board.cities)
-        self.display_outbreaks()
-        self.display_infection_rate()
+        self.display_connecting_lines(board.graph.edges, board.cities)
+        self.display_cities(board.cities)
+        self.display_outbreaks(board.outbreaks_counter)
+        self.display_infection_rate(board.infection_rate_counter)
         self.display_action_tab_opener()
 
     def display_action_menu(self):
@@ -148,8 +150,8 @@ class GUI:
         write(self.screen, "Build", 40, 530, 710, c.BLACK)
         write(self.screen, "Treat", 40, 755, 710, c.BLACK)
 
-    def display_current_board_position(self, current_player: Player, players: pygame.sprite.Group):
-        self.display_board()
+    def display_current_board_position(self, current_player: Player, players: pygame.sprite.Group, board: Board):
+        self.display_board(board)
         self.screen.blit(current_player.image, (20, 20))
         write(self.screen, f"{current_player.moves}", 60, 70, 20)
         players.draw(self.screen)
@@ -160,8 +162,6 @@ class GUI:
         for button in card_buttons:
             button.display_button(self.screen)
 
-        pygame.display.flip()
-
     def display_disease_choices(self, available_choices: list[TextButton]):
         self.display_action_menu()
         write(self.screen, "Pick what disease you want to treat", 50, c.WIDTH / 3.2, 580)
@@ -170,76 +170,145 @@ class GUI:
             rectangle_color = from_str_to_color(available_choices[index].info)
             available_choices[index].display_button(self.screen, rect_color=rectangle_color, text_color=c.WHITE)
 
-    def pick_a_card(self, card_buttons: list[TextButton | ImageButton]) -> str | None:
-        run = True
-        while run:
-            for event in pygame.event.get():
-
-                if event.type == pygame.QUIT:
-                    run = False
-
-                if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                    mouse_x, mouse_y = pygame.mouse.get_pos()
-
-                    # PLAYER TRIES TO REMOVE THE ACTION MENU
-                    if mouse_y not in range(540, 800):
-                        self.action_menu_open = False
-                        return None
-
-                    for card_button in card_buttons:
-                        if card_button.is_clicked(mouse_x, mouse_y):
-                            return card_button.info
-
-    def pick_a_city(self) -> str:
-        while True:
-            mouse_x, mouse_y = self.get_next_input()
-
-            for city, city_data in self.board.cities.items():
-                if distance_between_two_points(mouse_x, mouse_y, city_data.x, city_data.y) < c.RADIUS_OF_CIRCLE:
-                    return city
-
     @staticmethod
-    def find_pressed_button(mouse_x: int, mouse_y: int, buttons: list[TextButton | ImageButton]) -> TextButton | ImageButton | None:
+    def find_pressed_button(mouse_x: int, mouse_y: int,
+                            buttons: list[TextButton | ImageButton]) -> TextButton | ImageButton | None:
         for button in buttons:
             if button.is_clicked(mouse_x, mouse_y):
                 return button
 
         return None
 
-    def handle_button_action(self, card_buttons: list[TextButton | Button], action: str, player: Player, players: pygame.sprite.Group):
+    def handle_hand_screen(self, card_buttons: list[TextButton | Button], action: str,
+                           player: Player, game: Game):
         while True:
             mouse_x, mouse_y = self.get_next_input()
 
             if mouse_y not in range(540, 800):
                 self.action_menu_open = False
-                self.display_current_board_position(player, players)
-                pygame.display.flip()
+                self.display_current_board_position(player, game.players, game.board)
                 break
 
             pressed_card_button = self.find_pressed_button(mouse_x, mouse_y, card_buttons)
             if pressed_card_button is not None:
-                pressed_card_name = pressed_card_button.info
+                city_name = pressed_card_button.info
+                self.handle_hand_action(city_name, action, player, game)
 
-                if pressed_card_name == player.city and action == "Hand":
-                    self.display_current_board_position(player, players)
+                self.display_current_board_position(player, game.players, game.board)
+                break
+
+    def handle_hand_action(self, city_name: str, action: str, player: Player, game: Game):
+        if city_name == player.city and action == "Hand":
+            self.display_current_board_position(player, game.players, game.board)
+            pygame.display.flip()
+
+            destination = self.get_destination(game.board)
+            game.move_player_to_destination(player, destination)
+        elif city_name != player.city and action == "Hand":
+            game.move_player_to_destination(player, city_name)
+        elif city_name == player.city and action == "Build":
+            game.build_research_station(player, city_name)
+
+        player.cards.remove(city_name)
+
+    def get_destination(self, board: Board) -> str:
+        while True:
+            mouse_x, mouse_y = self.get_next_input()
+            destination = board.get_city_at_coordinates(mouse_x, mouse_y)
+
+            if destination is not None:
+                break
+
+        return destination
+
+    @staticmethod
+    def handle_actions_without_menu(board: Board, player: Player, mouse_x: int, mouse_y: int):
+        # CHECKING IF THE PLAYER TRIES TO MOVE TO ANOTHER CITY
+        chosen_city = board.get_city_at_coordinates(mouse_x, mouse_y)
+        if chosen_city is not None and (board.has_edge(chosen_city, player.city)
+                                        or board.is_shuttle_flight(player.city, chosen_city)):
+            player.move(board.cities[chosen_city].x, board.cities[chosen_city].y, chosen_city)
+
+    def get_chosen_disease(self, buttons: list[TextButton]) -> str | None:
+        while True:
+            mouse_x, mouse_y = self.get_next_input()
+
+            if mouse_y not in range(540, 800):
+                return None
+
+            pressed_button = self.find_pressed_button(mouse_x, mouse_y, buttons)
+
+            if pressed_button is not None:
+                return pressed_button.info
+
+    def handle_treat_action(self, game: Game, player: Player, button_factory: ButtonFactory):
+        diseases = [(colour, value) for colour, value in
+                    game.board.cities[player.city].diseases.items() if
+                    value > 0]
+        if len(diseases) == 1:
+            game.treat(player, 1, diseases[0][0])
+            self.display_current_board_position(player, game.players, game.board)
+
+            self.action_menu_open = False
+        else:
+            self.display_current_board_position(player, game.players, game.board)
+            choices = button_factory.create_disease_removal_options_buttons(diseases)
+            self.display_disease_choices(choices)
+
+            pygame.display.flip()
+            chosen_disease_color = self.get_chosen_disease(choices)
+
+            if chosen_disease_color is not None:
+                game.treat(player, 1, chosen_disease_color)
+
+            self.display_current_board_position(player, game.players, game.board)
+            self.action_menu_open = False
+
+    def handle_actions_with_menu(self, button_factory: ButtonFactory, game: Game, player: Player, mouse_x: int, mouse_y: int):
+        # CHECKING IF THE PLAYER HAS PRESSED AN ACTION BUTTON
+        for button in self.action_button_list:
+            if button.is_clicked(mouse_x, mouse_y):
+                if button.info in ("Hand", "Build"):
+                    card_buttons = button_factory.create_city_buttons(game.board.cities,
+                                                                      player.cards)
+                    self.display_player_hand(card_buttons)
+                    pygame.display.flip()
+
+                    self.handle_hand_screen(card_buttons, button.info,
+                                            player, game)
+                    self.action_menu_open = False
+                elif button.info == "Treat":
+                    self.handle_treat_action(game, player, button_factory)
+
+    def start(self, game: Game, button_factory: ButtonFactory):
+        run = True
+        while run:
+            # PLAYERS TURN
+            for player in game.players:
+                self.display_current_board_position(player, game.players, game.board)
+
+                while player.moves > 0:
                     pygame.display.flip()
 
                     mouse_x, mouse_y = self.get_next_input()
 
-                    destination = self.board.get_city_at_coordinates(mouse_x, mouse_y)
-                    target_city = self.board.cities[destination]
-                    player.move(target_city.x, target_city.y, destination)
+                    # ACTIONS POSSIBLE WITH MENU OFF
+                    if self.action_menu_open is False:
+                        if mouse_y in range(780, 800):
+                            self.display_action_menu()
+                            self.display_action_icons()
+                        else:
+                            self.handle_actions_without_menu(game.board, player, mouse_x, mouse_y)
+                            self.display_current_board_position(player, game.players, game.board)
+                    # ACTIONS POSSIBLE WITH MENU ON
+                    else:
+                        # CLOSING THE MENU
+                        if mouse_y not in range(540, 800):
+                            self.action_menu_open = False
+                            self.display_current_board_position(player, game.players, game.board)
+                        else:
+                            self.handle_actions_with_menu(button_factory, game, player, mouse_x, mouse_y)
 
-                elif pressed_card_name == player.city and action == "Build":
-                    self.board.cities[pressed_card_name].has_research_station = True
-                    player.moves -= 1
+                player.replenish_moves()
 
-                elif pressed_card_name != player.city:
-                    target_city = self.board.cities[pressed_card_name]
-                    player.move(target_city.x, target_city.y, pressed_card_name)
-
-                player.cards.remove(pressed_card_name)
-                if player.moves != 0:
-                    self.display_current_board_position(player, players)
-                    pygame.display.flip()
-                break
+        pygame.quit()

@@ -38,6 +38,9 @@ class Board:
     def has_edge(self, chosen_city: str, player_city: str) -> bool:
         return self.graph.has_edge(chosen_city, player_city)
 
+    def is_shuttle_flight(self, player_city: str, destination: str) -> bool:
+        return self.cities[player_city].has_research_station and self.cities[destination].has_research_station
+
     def get_city_at_coordinates(self, mouse_x: int, mouse_y: int) -> str | None:
         for city in self.cities:
             if distance_between_two_points(mouse_x, mouse_y,

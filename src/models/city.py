@@ -9,9 +9,9 @@ class City:
         self.image = image
         self.diseases: dict = {
             "Red": 0,
-            "Blue": 0,
+            "Blue": 1,
             "Yellow": 0,
-            "Black": 1
+            "Black": 0
         }
         self.has_research_station = has_research_station
         self.x = x
