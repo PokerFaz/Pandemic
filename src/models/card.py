@@ -1,4 +1,6 @@
-import pygame.image
+from pygame import Surface
+
+
 class Card:
     def __init__(self, card_type: str, name: str):
         self.card_type = card_type
@@ -9,7 +11,7 @@ class Card:
 
 
 class CityCard(Card):
-    def __init__(self, city: str, image: pygame.image):
+    def __init__(self, city: str, image: Surface):
         super().__init__("City Card", city)
         self.image = image
         self.rect = self.image.get_rect()

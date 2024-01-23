@@ -1,8 +1,9 @@
-import pygame.sprite
+from pygame.sprite import Sprite
+from pygame import Surface
 
 
-class Player(pygame.sprite.Sprite):
-    def __init__(self, name: str, player_image: pygame.image, x: int, y: int, offset_by_x: int):
+class Player(Sprite):
+    def __init__(self, name: str, player_image: Surface, x: int, y: int, offset_by_x: int):
         super().__init__()
         self.name = name
         self.city = "Atlanta"
@@ -17,7 +18,7 @@ class Player(pygame.sprite.Sprite):
         return f"{self.name} is currently in {self.city}. They have {len(self.cards)} cards: {self.cards}"
 
     def move(self, x: int, y: int, city: str):
-        self.rect.center = (x+5+self.offset_by_x, y-25)
+        self.rect.center = (x + 5 + self.offset_by_x, y - 25)
         self.city = city
         self.moves -= 1
         print(f"Player successfully moved to {city}")

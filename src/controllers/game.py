@@ -102,11 +102,9 @@ class Game:
                                 # CHECKING IF THE PLAYER TRIES TO MOVE TO ANOTHER CITY
                                 chosen_city = self.board.get_city_at_coordinates(mouse_x, mouse_y)
                                 print(chosen_city)
-                                print(player.city)
                                 if chosen_city is not None and (self.board.has_edge(chosen_city, player.city)
                                                                 or (self.board.cities[chosen_city].has_research_station
-                                                                    and self.board.cities[
-                                                                        player.city].has_research_station)):
+                                                                    and self.board.cities[player.city].has_research_station)):
                                     player.move(self.board.cities[chosen_city].x, self.board.cities[chosen_city].y, chosen_city)
                                     game_gui.display_current_board_position(player, self.players)
                                     break

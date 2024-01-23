@@ -1,13 +1,13 @@
 import os
 import pygame
-from src.misc import constants as c
+from src.misc.constants import WIDTH, HEIGHT
 
 background = pygame.image.load(os.path.join("assets", "PandemicMapV2.png"))
-background = pygame.transform.scale(background, (c.WIDTH, c.HEIGHT))
+background = pygame.transform.scale(background, (WIDTH, HEIGHT))
 logo = pygame.image.load(os.path.join("assets", "PandemicLogo.png"))
 logo = pygame.transform.scale(logo, (600, 300))
 earth = pygame.image.load(os.path.join("assets", "Starting.png"))
-earth = pygame.transform.scale(earth, (c.WIDTH, c.HEIGHT))
+earth = pygame.transform.scale(earth, (WIDTH, HEIGHT))
 back_image = pygame.image.load(os.path.join("assets", "BackOfRole.png"))
 
 role_1 = pygame.image.load(os.path.join("assets", "Scientist.png"))

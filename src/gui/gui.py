@@ -5,11 +5,11 @@ from src.models.buttons.image_button import ImageButton
 from src.models.city import from_str_to_color
 from src.models.board import Board
 from src.models.city import City
-from src.models.board import distance_between_click_and_city
 from src.misc import constants as c
 from src.models.buttons.button import Button
 from src.models.player import Player
 from src.misc.images import background
+from src.misc.utility import distance_between_two_points
 
 
 def iterate_diseases(city_diseases):
@@ -195,7 +195,7 @@ class GUI:
             mouse_x, mouse_y = self.get_next_input()
 
             for city, city_data in self.board.cities.items():
-                if distance_between_click_and_city(mouse_x, mouse_y, city_data.x, city_data.y) < c.RADIUS_OF_CIRCLE:
+                if distance_between_two_points(mouse_x, mouse_y, city_data.x, city_data.y) < c.RADIUS_OF_CIRCLE:
                     return city
 
     @staticmethod
@@ -217,9 +217,9 @@ class GUI:
                 break
 
             pressed_card_button = self.find_pressed_button(mouse_x, mouse_y, card_buttons)
-            pressed_card_name = pressed_card_button.info
+            if pressed_card_button is not None:
+                pressed_card_name = pressed_card_button.info
 
-            if pressed_card_name is not None:
                 if pressed_card_name == player.city and action == "Hand":
                     self.display_current_board_position(player, players)
                     pygame.display.flip()
