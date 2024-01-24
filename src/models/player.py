@@ -4,7 +4,7 @@ from pygame import Surface
 
 class Player(Sprite):
     def __init__(self, name: str, player_image: Surface, x: int, y: int, offset_by_x: int):
-        super().__init__()
+        Sprite.__init__(self)
         self.name = name
         self.city = "Atlanta"
         self.cards = []
@@ -32,3 +32,10 @@ class Player(Sprite):
 
     def replenish_moves(self):
         self.moves = 4
+
+    def has(self, city_name: str) -> bool:
+        for card in self.cards:
+            if card == city_name:
+                return True
+
+        return False

@@ -4,7 +4,7 @@ from pygame import Surface
 from src.models.city import City
 from src.models.buttons.image_button import ImageButton
 from src.models.buttons.text_button import TextButton
-from src.misc.utility import load_image
+from src.misc.utility import load_image, resize
 
 
 class ButtonFactory:
@@ -76,7 +76,8 @@ class ButtonFactory:
             ImageButton(300, 550, "Hand", image=i.back_of_cities),
             ImageButton(495, 550, "Build", image=i.research_station_image),
             ImageButton(720, 555, "Treat", image=i.treat_image),
-            ImageButton(920, 550, "Cure", image=i.flask_image)
+            ImageButton(920, 550, "Cure", image=i.flask_image),
+            ImageButton(1080, 540, "Share", image=i.exchange_image)
         ]
 
         return result_hand_button
@@ -97,3 +98,24 @@ class ButtonFactory:
                   index, (color, number_of_diseases) in enumerate(available_choices)]
 
         return result
+
+    @staticmethod
+    def create_buttons_for_share(player_info: list[tuple[str, Surface]]) -> list[ImageButton | TextButton]:
+        x = 5
+        player_buttons: list[ImageButton | TextButton] = [ImageButton(x + 190 * int(index), 550, name, image=resize(image, 200, 200))
+                                                          for index, (name, image) in enumerate(player_info, start=0)]
+
+        additional_buttons = [
+            TextButton(700, 650, "Give", 100, 70, "Give", 50),
+            TextButton(850, 650, "Take", 100, 70, "Take", 50)
+        ]
+
+        player_buttons.extend(additional_buttons)
+
+        return player_buttons
+
+    def create_cure_buttons(self, cities: dict[str, City], player_cards: list[str]) -> list[TextButton | ImageButton]:
+        city_buttons: list[ImageButton | TextButton] = self.create_city_buttons(cities, player_cards)
+        cure_button = TextButton(1400, 650, "cure", 100, 55, "CURE", 40)
+        city_buttons.append(cure_button)
+        return city_buttons

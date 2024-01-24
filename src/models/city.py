@@ -7,9 +7,9 @@ class City:
         self.name = name
         self.color: color = from_str_to_color(colour)
         self.image = image
-        self.diseases: dict = {
-            "Red": 0,
-            "Blue": 1,
+        self.diseases: dict[str, int] = {
+            "Red": 1,
+            "Blue": 0,
             "Yellow": 0,
             "Black": 0
         }
@@ -20,6 +20,9 @@ class City:
     def __str__(self):
         return (f"{self.name} - Color: {self.color}, "
                 f"Diseases: {self.diseases}")
+
+    def has_diseases(self) -> bool:
+        return sum(self.diseases.values()) > 0
 
     def add_diseases(self, number: int, colour: color):
         colour = from_color_to_str(colour)

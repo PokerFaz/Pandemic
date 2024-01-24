@@ -12,10 +12,10 @@ class Game:
         self.difficulty = ""
         # NUMBER OF REMAINING CUBES AND WHETHER THE DISEASES ARE CURED
         self.disease_info: dict[str, (int, bool)] = {
-            "Red": (24, False),
-            "Blue": (24, False),
-            "Yellow": (24, False),
-            "Black": (24, False)
+            "Red": (24, False, False),
+            "Blue": (24, False, False),
+            "Yellow": (24, False, False),
+            "Black": (24, False, False)
         }
         self.research_station_count = 7
         self.player_deck = None
@@ -74,7 +74,16 @@ class Game:
             print(player)
             print(self.player_deck)
 
-    def is_disease_cured(self, color: str):
+    def get_player(self, name: str) -> Player | None:
+        for player in self.players:
+            if player.name == name:
+                return player
+        return None
+
+    def more_than_one_person_in_city(self, city_name: str) -> bool:
+        return sum(1 for player in self.players if player.city == city_name) > 1
+
+    def is_disease_cured(self, color: str) -> bool:
         return self.disease_info[color][1]
 
     def move_player_to_destination(self, player: Player, city_name: str):
@@ -90,6 +99,17 @@ class Game:
         player.moves -= 1
 
     def cure(self, color: str):
-        self.disease_info[color] = (self.disease_info[color][0], True)
+        self.disease_info[color] = (self.disease_info[color][0], True, False)
         print(f"Cured {color}")
 
+    @staticmethod
+    def share(current_player: Player, other_player: Player, action: str):
+
+        if action == "Give":
+            current_player.cards.remove(current_player.city)
+            other_player.cards.append(current_player.city)
+        else:
+            current_player.cards.append(current_player.city)
+            other_player.cards.remove(current_player.city)
+
+        current_player.moves -= 1

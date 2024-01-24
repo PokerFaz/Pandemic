@@ -29,6 +29,10 @@ def load_image(file_name: str) -> pygame.Surface:
     return pygame.image.load(file_name)
 
 
+def resize(image: pygame.Surface, new_x: int, new_y: int) -> pygame.Surface:
+    return pygame.transform.scale(image, (new_x, new_y))
+
+
 def from_str_to_color(color_name: str) -> color:
     color_mapping = {
         "Red": RED,
