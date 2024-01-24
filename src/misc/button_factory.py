@@ -43,7 +43,7 @@ class ButtonFactory:
         return result
 
     @staticmethod
-    def create_roles_menu_buttons(role_dict: dict[str: (Surface, Surface)]) -> list[tuple[ImageButton, int] | tuple[TextButton, int]]:
+    def create_roles_menu_buttons(role_dict: dict[str, (Surface, Surface)]) -> list[tuple[ImageButton, int] | tuple[TextButton, int]]:
         """
         CREATES ROLE BUTTONS LIST THAT CONTAINS THE ROLE AND ON WHICH SCREEN THEY WILL APPEAR ON
         PLUS ADDITIONAL BUTTONS
@@ -75,13 +75,14 @@ class ButtonFactory:
         result_hand_button = [
             ImageButton(300, 550, "Hand", image=i.back_of_cities),
             ImageButton(495, 550, "Build", image=i.research_station_image),
-            ImageButton(720, 555, "Treat", image=i.treat_image)
+            ImageButton(720, 555, "Treat", image=i.treat_image),
+            ImageButton(920, 550, "Cure", image=i.flask_image)
         ]
 
         return result_hand_button
 
     @staticmethod
-    def create_city_buttons(cities: dict[str: City], player_cards: list[str]) -> list[ImageButton]:
+    def create_city_buttons(cities: dict[str, City], player_cards: list[str]) -> list[ImageButton]:
         x = 5
         city_buttons = [ImageButton(x + 190 * index, 550, card, image=load_image(cities[card].image)) for index, card in
                         enumerate(player_cards, start=0)]

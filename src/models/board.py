@@ -6,7 +6,7 @@ from src.misc.utility import load_json_from_file, find_file, join_path, distance
 
 class Board:
     def __init__(self):
-        self.cities: dict[str: City] = {}
+        self.cities: dict[str, City] = {}
         self.graph = nx.Graph()
         self.outbreaks_counter = 0
         self.infection_rate_counter = 0

@@ -26,5 +26,9 @@ class Player(Sprite):
     def draw(self, cards: list[str]):
         self.cards.extend(cards)
 
+    def remove_cards(self, cards: list[str]):
+        for card in cards:
+            self.cards.remove(card)
+
     def replenish_moves(self):
         self.moves = 4

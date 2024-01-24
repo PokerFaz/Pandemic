@@ -2,7 +2,7 @@ from src.models.board import Board
 from src.models.decks.infection_deck import InfectionDeck, Deck
 from src.models.decks.player_deck import PlayerDeck
 from src.models.player import Player
-import pygame
+from pygame.sprite import Group
 
 
 class Game:
@@ -11,7 +11,7 @@ class Game:
         self.player_count = 0
         self.difficulty = ""
         # NUMBER OF REMAINING CUBES AND WHETHER THE DISEASES ARE CURED
-        self.disease_info: dict[str: (int, bool)] = {
+        self.disease_info: dict[str, (int, bool)] = {
             "Red": (24, False),
             "Blue": (24, False),
             "Yellow": (24, False),
@@ -22,7 +22,7 @@ class Game:
         self.players_discard_pile = None
         self.infection_deck = None
         self.infection_discard_pile = None
-        self.players = pygame.sprite.Group()
+        self.players = Group()
 
     def setup(self):
         # CREATING THE CITY GRAPH IN THE BOARD
@@ -63,7 +63,7 @@ class Game:
     def initial_draw(self):
 
         n = 4 if int(self.player_count) == 2 else (3 if int(self.player_count) == 3 else 2)
-
+        n = 7
         for player in self.players:
             drawn_cards = self.player_deck.get_cards(n)
 
@@ -73,6 +73,9 @@ class Game:
 
             print(player)
             print(self.player_deck)
+
+    def is_disease_cured(self, color: str):
+        return self.disease_info[color][1]
 
     def move_player_to_destination(self, player: Player, city_name: str):
         target_city = self.board.cities[city_name]
@@ -85,3 +88,8 @@ class Game:
     def treat(self, player: Player, number: int,  color: str):
         self.board.cities[player.city].remove_diseases(number, color)
         player.moves -= 1
+
+    def cure(self, color: str):
+        self.disease_info[color] = (self.disease_info[color][0], True)
+        print(f"Cured {color}")
+
