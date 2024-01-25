@@ -15,6 +15,7 @@ WHITE = (255, 255, 255)
 HEIGHT_PLAYER = 40
 LENGTH_PLAYER = 40
 RADIUS_OF_CIRCLE = 10
+MAX_NUMBER_OF_CARDS = 7
 NUMBER_OF_PLAYERS = ("2", "3", "4")
 DIFFICULTIES = ("EASY", "NORMAL", "COVID19")
 color = NewType("color", tuple[int, int, int])

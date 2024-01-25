@@ -3,7 +3,7 @@ import os
 import pygame
 from src.misc.constants import RED, YELLOW, BLUE, BLACK, color
 from math import sqrt
-from typing import Any
+from typing import Any, Iterable
 
 
 def load_json_from_file(file_name: str) -> Any:
@@ -29,7 +29,7 @@ def load_image(file_name: str) -> pygame.Surface:
     return pygame.image.load(file_name)
 
 
-def resize(image: pygame.Surface, new_x: int, new_y: int) -> pygame.Surface:
+def resize(image: pygame.Surface, new_x: float, new_y: float) -> pygame.Surface:
     return pygame.transform.scale(image, (new_x, new_y))
 
 
@@ -55,5 +55,16 @@ def from_color_to_str(colour: color) -> str:
     return color_mapping.get(colour)
 
 
-def distance_between_two_points(p1_x: int, p1_y: int, p2_x: int, p2_y: int) -> float:
+def distance_between_two_points(p1_x: float, p1_y: float, p2_x: float, p2_y: float) -> float:
     return sqrt(abs((p2_x - p1_x) ** 2 + (p2_y - p1_y) ** 2))
+
+
+def my_enumerate(iterable: Iterable, reset: int) -> tuple[int, int, Any]:
+    index = 0
+    breaks = 0
+    for elem in iterable:
+        if index == reset:
+            index = 0
+            breaks += 1
+        yield breaks, index, elem
+        index += 1

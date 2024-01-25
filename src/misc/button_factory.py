@@ -2,9 +2,10 @@ from src.misc.constants import WIDTH, HEIGHT, NUMBER_OF_PLAYERS, DIFFICULTIES
 import src.misc.images as i
 from pygame import Surface
 from src.models.city import City
+from src.models.buttons.button import Button
 from src.models.buttons.image_button import ImageButton
 from src.models.buttons.text_button import TextButton
-from src.misc.utility import load_image, resize
+from src.misc.utility import load_image, resize, my_enumerate
 
 
 class ButtonFactory:
@@ -83,10 +84,12 @@ class ButtonFactory:
         return result_hand_button
 
     @staticmethod
-    def create_city_buttons(cities: dict[str, City], player_cards: list[str]) -> list[ImageButton]:
+    def create_city_buttons(cities: dict[str, City], player_cards: list[str], new_x: float = 180, new_y: float = 250, per_row: int = -1) -> list[ImageButton]:
         x = 5
-        city_buttons = [ImageButton(x + 190 * index, 550, card, image=load_image(cities[card].image)) for index, card in
-                        enumerate(player_cards, start=0)]
+        city_buttons = [
+            ImageButton(x + 190 * index, 550 - counter * (new_y + 40), card, image=resize(load_image(cities[card].image), new_x, new_y))
+            for counter, index, card in
+            my_enumerate(player_cards, per_row)]
 
         return city_buttons
 
@@ -100,10 +103,10 @@ class ButtonFactory:
         return result
 
     @staticmethod
-    def create_buttons_for_share(player_info: list[tuple[str, Surface]]) -> list[ImageButton | TextButton]:
+    def create_share_buttons(player_info: list[tuple[str, Surface]]) -> list[Button]:
         x = 5
-        player_buttons: list[ImageButton | TextButton] = [ImageButton(x + 190 * int(index), 550, name, image=resize(image, 200, 200))
-                                                          for index, (name, image) in enumerate(player_info, start=0)]
+        player_buttons: list[Button] = [ImageButton(x + 190 * int(index), 550, name, image=resize(image, 200, 200))
+                                        for index, (name, image) in enumerate(player_info, start=0)]
 
         additional_buttons = [
             TextButton(700, 650, "Give", 100, 70, "Give", 50),
@@ -114,8 +117,15 @@ class ButtonFactory:
 
         return player_buttons
 
-    def create_cure_buttons(self, cities: dict[str, City], player_cards: list[str]) -> list[TextButton | ImageButton]:
-        city_buttons: list[ImageButton | TextButton] = self.create_city_buttons(cities, player_cards)
+    def create_cure_buttons(self, cities: dict[str, City], player_cards: list[str]) -> list[Button]:
+        city_buttons: list[Button] = self.create_city_buttons(cities, player_cards)
         cure_button = TextButton(1400, 650, "cure", 100, 55, "CURE", 40)
         city_buttons.append(cure_button)
+        return city_buttons
+
+    def create_remove_menu_buttons(self, cities: dict[str, City], player_cards: list[str], per_row: int) -> list[Button]:
+        city_buttons: list[Button] = self.create_city_buttons(cities, player_cards, per_row=per_row)
+        print(player_cards)
+        remove_button = TextButton(1350, 650, "remove", 120, 55, "REMOVE", 40)
+        city_buttons.append(remove_button)
         return city_buttons

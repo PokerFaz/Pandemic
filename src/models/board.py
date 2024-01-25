@@ -39,12 +39,12 @@ class Board:
         return self.graph.has_edge(chosen_city, player_city)
 
     def is_shuttle_flight(self, player_city: str, destination: str) -> bool:
-        return self.cities[player_city].has_research_station and self.cities[destination].has_research_station
+        return self.cities[player_city].has_research_station_ and self.cities[destination].has_research_station_
 
-    def get_city_at_coordinates(self, mouse_x: int, mouse_y: int) -> str | None:
+    def get_city_at_coordinates(self, mouse_x: float, mouse_y: float) -> City | None:
         for city in self.cities:
             if distance_between_two_points(mouse_x, mouse_y,
                                            self.cities[city].x, self.cities[city].y) < c.RADIUS_OF_CIRCLE:
-                return city
+                return self.cities[city]
 
         return None

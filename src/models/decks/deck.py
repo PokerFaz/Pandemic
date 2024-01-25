@@ -22,5 +22,8 @@ class Deck:
     def remove_top_cards(self, number_of_removed_cards: int):
         self.deck = self.deck[number_of_removed_cards:]
 
-    def get_cards(self, number: int) -> list[str]:
-        return [city.name for city in self.deck[:number]]
+    def get_cards(self, number: int) -> list[Card]:
+        result = [city for city in self.deck[:number]]
+        self.remove_top_cards(number)
+        return result
+

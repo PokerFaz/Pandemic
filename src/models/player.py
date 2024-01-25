@@ -1,9 +1,10 @@
 from pygame.sprite import Sprite
 from pygame import Surface
+from src.misc.images import back_image
 
 
 class Player(Sprite):
-    def __init__(self, name: str, player_image: Surface, x: int, y: int, offset_by_x: int):
+    def __init__(self, name: str = "", player_image: Surface = back_image, x: int = 0, y: int = 0, offset_by_x: int = 0):
         Sprite.__init__(self)
         self.name = name
         self.city = "Atlanta"
