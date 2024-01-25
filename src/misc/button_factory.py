@@ -78,7 +78,8 @@ class ButtonFactory:
             ImageButton(495, 550, "Build", image=i.research_station_image),
             ImageButton(720, 555, "Treat", image=i.treat_image),
             ImageButton(920, 550, "Cure", image=i.flask_image),
-            ImageButton(1080, 540, "Share", image=i.exchange_image)
+            ImageButton(1080, 540, "Share", image=i.exchange_image),
+            ImageButton( 1250, 550, "Skip", image=i.treat_image)
         ]
 
         return result_hand_button

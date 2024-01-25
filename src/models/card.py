@@ -18,8 +18,9 @@ class CityCard(Card):
 
 
 class EpidemicCard(Card):
-    def __init__(self):
+    def __init__(self, image: Surface):
         super().__init__("Epidemic Card", "epidemic_card")
+        self.image = image
 
 
 class EventCard(Card):

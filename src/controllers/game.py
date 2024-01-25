@@ -64,8 +64,8 @@ class Game:
 
     def initial_draw(self):
 
-        # n = 4 if int(self.player_count) == 2 else (3 if int(self.player_count) == 3 else 2)
-        n = 7
+        n = 4 if int(self.player_count) == 2 else (3 if int(self.player_count) == 3 else 2)
+        pp
         for player in self.players:
             drawn_cards = self.player_deck.get_cards(n)
 

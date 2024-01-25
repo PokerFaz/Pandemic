@@ -464,6 +464,8 @@ class GUI:
                     self.handle_cure_action(game, button_factory)
                 elif pressed_button.info == "Share":
                     self.handle_share_action(game, button_factory)
+                elif pressed_button.info == "Skip":
+                    game.current_player.moves = 0
 
                 break
 
@@ -497,7 +499,7 @@ class GUI:
                                 if mouse_y in range(780, 800):
                                     texts = [("Hand", 40, 315, 710, c.BLACK), ("Build", 40, 530, 710, c.BLACK),
                                              ("Treat", 40, 755, 710, c.BLACK), ("Cure", 40, 960, 710, c.BLACK),
-                                             ("Share", 40, 1132, 710, c.BLACK)]
+                                             ("Share", 40, 1132, 710, c.BLACK), ("Skip", 40, 1300, 710, c.BLACK)]
                                     self.display_action_menu()
                                     self.display_contents_on_menu_screen(self.action_button_list, {},
                                                                          texts)
