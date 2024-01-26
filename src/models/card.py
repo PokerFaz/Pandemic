@@ -1,4 +1,5 @@
 from pygame import Surface
+from src.misc.images import epidemic_image
 
 
 class Card:
@@ -18,9 +19,9 @@ class CityCard(Card):
 
 
 class EpidemicCard(Card):
-    def __init__(self, image: Surface):
+    def __init__(self):
         super().__init__("Epidemic Card", "epidemic_card")
-        self.image = image
+        self.image = epidemic_image
 
 
 class EventCard(Card):

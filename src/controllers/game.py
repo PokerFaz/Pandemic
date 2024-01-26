@@ -4,6 +4,7 @@ from src.models.decks.player_deck import PlayerDeck
 from src.models.player import Player
 from pygame.sprite import Group
 from src.misc.utility import from_color_to_str
+from src.models.city import City
 
 
 class Game:
@@ -39,6 +40,9 @@ class Game:
         # DEALING CARDS TO ALL THE PLAYERS
         self.initial_draw()
 
+        # ADD THE EPIDEMIC CARDS
+        self.player_deck.prepare_deck(self.difficulty)
+
     def setup_board(self):
         self.board.add_cities()
         self.board.add_connections()
@@ -51,6 +55,10 @@ class Game:
         self.infection_deck = InfectionDeck(self.board.cities)
         self.infection_discard_pile = Deck()
         self.infection_deck.shuffle()
+
+    def infect(self, target_city: City, color: str, number: int):
+        target_city.add_diseases(number, color)
+        self.disease_info[color][0] -= number
 
     def initial_infection(self):
         target_cities = self.infection_deck.get_cards(9)
@@ -65,7 +73,7 @@ class Game:
     def initial_draw(self):
 
         n = 4 if int(self.player_count) == 2 else (3 if int(self.player_count) == 3 else 2)
-        pp
+
         for player in self.players:
             drawn_cards = self.player_deck.get_cards(n)
 
@@ -103,7 +111,8 @@ class Game:
 
         match movement:
             case "basic":
-                if self.can_drive(self.current_player.city, target_city_name) or self.can_shuttle(self.current_player.city, target_city_name):
+                if self.can_drive(self.current_player.city, target_city_name) or self.can_shuttle(
+                        self.current_player.city, target_city_name):
                     can_move = True
             case "direct" | "charter":
                 if self.current_player.city != target_city_name:
@@ -153,11 +162,36 @@ class Game:
 
         self.current_player.moves -= 1
 
+    def increase_infection_marker(self):
+        self.board.infection_rate_counter += 1
+
+    def resolve_epidemic_card(self):
+        self.increase_infection_marker()
+
+        card = self.infection_deck.get_bottom_card()
+        to_be_infected_city = self.board.cities[card.name]
+        self.infect(to_be_infected_city, from_color_to_str(to_be_infected_city.color), 3)
+
+        self.infection_discard_pile.add_cards([card])
+
+        self.infection_discard_pile.shuffle()
+        self.infection_deck.add_cards([card for card in self.infection_discard_pile])
+
     def end_turn(self):
         self.current_player.replenish_moves()
 
-        drawn_cards = self.player_deck.get_cards(2)
-        self.current_player.draw([city.name for city in drawn_cards])
+        drawn_cards = [card.name for card in self.player_deck.get_cards(2)]
+        print(drawn_cards)
+        if "epidemic_card" in drawn_cards:
+            print("oh no")
+            self.resolve_epidemic_card()
+            drawn_cards.remove("epidemic_card")
+        self.current_player.draw([city for city in drawn_cards])
 
+        counter = self.board.infection_rate_counter
+        cards_to_take = 2 if counter < 3 else (3 if counter < 5 else 4)
+        drawn_cards = self.infection_deck.get_cards(cards_to_take)
 
-
+        for card in drawn_cards:
+            target_city = self.board.cities[card.name]
+            self.infect(target_city, from_color_to_str(target_city.color), 1)

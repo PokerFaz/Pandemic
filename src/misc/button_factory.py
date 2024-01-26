@@ -79,16 +79,19 @@ class ButtonFactory:
             ImageButton(720, 555, "Treat", image=i.treat_image),
             ImageButton(920, 550, "Cure", image=i.flask_image),
             ImageButton(1080, 540, "Share", image=i.exchange_image),
-            ImageButton( 1250, 550, "Skip", image=i.treat_image)
+            ImageButton(1250, 550, "Skip", image=i.treat_image)
         ]
 
         return result_hand_button
 
     @staticmethod
-    def create_city_buttons(cities: dict[str, City], player_cards: list[str], new_x: float = 180, new_y: float = 250, per_row: int = -1) -> list[ImageButton]:
+    def create_city_buttons(cities: dict[str, City], player_cards: list[str], new_x: float = 180, new_y: float = 250,
+                            per_row: int = -1) -> list[ImageButton]:
         x = 5
         city_buttons = [
-            ImageButton(x + 190 * index, 550 - counter * (new_y + 40), card, image=resize(load_image(cities[card].image), new_x, new_y))
+            ImageButton(x + 190 * index, 550 - counter * (new_y + 40), card,
+                        image=resize(load_image(cities[card].image) if card != "epidemic_card" else i.epidemic_image,
+                                     new_x, new_y))
             for counter, index, card in
             my_enumerate(player_cards, per_row)]
 

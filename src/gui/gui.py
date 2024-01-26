@@ -4,13 +4,13 @@ from src.models.buttons.button import Button
 from src.models.buttons.text_button import TextButton
 from src.models.buttons.image_button import ImageButton
 from src.models.city import City
-from src.misc import constants as c
 from src.models.player import Player
-from src.misc.images import background
-from src.controllers.game import Game
-from src.misc.button_factory import ButtonFactory
 from src.models.board import Board
 from src.misc.utility import load_image, resize, from_str_to_color, from_color_to_str
+from src.misc import constants as c
+from src.misc.images import background, epidemic_image
+from src.misc.button_factory import ButtonFactory
+from src.controllers.game import Game
 from typing import Callable
 
 
@@ -195,7 +195,7 @@ class GUI:
         for player in game.players:
             display_image(screen, player.image, (x, y + 20))
             self.display_player_hand(screen,
-                                     [resize(load_image(game.board.cities[city_name].image), 160, 222) for city_name in
+                                     [resize(load_image(game.board.cities[city_name].image) if city_name != "epidemic_card" else epidemic_image, 160, 222) for city_name in
                                       player.cards], x + 100, y)
             y += 150
 
@@ -522,8 +522,9 @@ class GUI:
                             self.display_current_board_position(game)
                 game.end_turn()
                 if len(game.current_player.cards) > c.MAX_NUMBER_OF_CARDS:
-                    print("hi")
                     self.remove_cards_from_player(game.current_player, button_factory, game, len(game.current_player.cards) - c.MAX_NUMBER_OF_CARDS)
                     self.action_menu_open = False
+
+                print(game.player_deck)
 
         pygame.quit()

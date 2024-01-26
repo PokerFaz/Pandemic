@@ -13,6 +13,10 @@ class Deck:
         info = [card.name for card in self.deck]
         return str(info)
 
+    def __iter__(self) -> Card:
+        for card in self.deck:
+            yield card
+
     def add_cards(self, cards: list[Card]):
         self.deck.extend(cards)
 
