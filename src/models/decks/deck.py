@@ -4,7 +4,7 @@ from src.models.card import Card
 
 class Deck:
     def __init__(self):
-        self.deck = []
+        self.deck: list[Card] = []
 
     def __len__(self) -> int:
         return len(self.deck)
@@ -26,8 +26,7 @@ class Deck:
     def remove_top_cards(self, number_of_removed_cards: int):
         self.deck = self.deck[number_of_removed_cards:]
 
-    def get_cards(self, number: int) -> list[Card]:
+    def top_n_cards(self, number: int) -> list[Card]:
         result = [city for city in self.deck[:number]]
         self.remove_top_cards(number)
         return result
-

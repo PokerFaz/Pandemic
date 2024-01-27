@@ -9,9 +9,10 @@ game = Game()
 menu = Menu()
 menu.start(game, button_factory)
 
-game.setup()
 
 game_gui = GUI(menu.screen)
+game.setup(game_gui.log_history)
+
 action_buttons = button_factory.create_action_buttons()
 game_gui.action_button_list.extend(action_buttons)
 

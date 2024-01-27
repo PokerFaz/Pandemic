@@ -1,6 +1,6 @@
 from src.models.decks.deck import Deck
 from src.models.city import City
-from src.models.card import CityCard, EpidemicCard
+from src.models.card import CityCard, EpidemicCard, EventCard
 import random
 from src.misc.utility import load_image
 
@@ -8,10 +8,7 @@ from src.misc.utility import load_image
 class PlayerDeck(Deck):
     def __init__(self, cities: dict[str: City]):
         super().__init__()
-        self.deck = [CityCard(city_info.name, load_image(city_info.image)) for city_info in cities.values()]
-
-    def __iter__(self):
-        super().__iter__()
+        self.deck: list[EventCard | CityCard | EpidemicCard] = [CityCard(city, load_image(city.image)) for city in cities.values()]
 
     # ADDS EPIDEMIC CARDS TO THE PLAYER DECK BASED ON THE DIFFICULTY
     def prepare_deck(self, difficulty: str):
@@ -31,3 +28,8 @@ class PlayerDeck(Deck):
             result.append(card)
 
         self.deck = result
+
+    def get_cards(self, number: int) -> list[EventCard | CityCard | EpidemicCard]:
+        result = [city for city in self.deck[:number]]
+        self.remove_top_cards(number)
+        return result

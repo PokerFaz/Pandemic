@@ -19,7 +19,8 @@ class City:
 
     def __str__(self):
         return (f"{self.name} - Color: {self.color}, "
-                f"Diseases: {self.diseases}")
+                f"Diseases: {self.diseases}"
+                f"{self.has_research_station_}")
 
     def has_research_station(self) -> bool:
         return self.has_research_station_
@@ -30,13 +31,13 @@ class City:
     def has_diseases(self) -> bool:
         return sum(self.diseases.values()) > 0
 
-    def add_diseases(self, number: int, colour: str):
+    def add_diseases(self, number: int, colour: str) -> bool:
 
         if self.diseases[colour] + number < 4:
             self.diseases[colour] = self.diseases[colour] + number
-            print(f"Added to {self.name} {number} cubes")
+            return False
         else:
-            pass  # WRITE AN OUTBREAK!!!!!!!!!!!!!!
+            return True
 
     def remove_diseases(self, number: int, colour: str):
         self.diseases[colour] = max(self.diseases[colour] - number, 0)

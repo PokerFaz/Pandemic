@@ -1,9 +1,10 @@
 import pygame
+from typing import Any
 
 
 class Button:
-    def __init__(self, x: int, y: int, name: str):
-        self.info = name
+    def __init__(self, x: int, y: int, info: Any):
+        self.info = info
         self.clickable = True
         self.x = x
         self.y = y

@@ -22,7 +22,6 @@ class Board:
             city = City(city_data["name"], city_data["color"], image, city_data["x"], city_data["y"],
                         True if city_data["name"] == "Atlanta" else False)
 
-            self.graph.add_node(city)
             self.cities[city.name] = city
 
     def add_connections(self):
@@ -42,6 +41,13 @@ class Board:
         return self.cities[player_city].has_research_station_ and self.cities[destination].has_research_station_
 
     def get_city_at_coordinates(self, mouse_x: float, mouse_y: float) -> City | None:
+        """
+        Used for finding the city that the user tried to click.
+
+        :param mouse_x: position of the input by x
+        :param mouse_y: position of the input by y
+        :return: City | None
+        """
         for city in self.cities:
             if distance_between_two_points(mouse_x, mouse_y,
                                            self.cities[city].x, self.cities[city].y) < c.RADIUS_OF_CIRCLE:

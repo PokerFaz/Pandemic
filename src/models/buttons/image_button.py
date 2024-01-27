@@ -1,12 +1,12 @@
-from src.models.buttons.button import Button
 import pygame
+from src.models.buttons.button import Button
+from typing import Any
 
 
 class ImageButton(Button):
-    def __init__(self, x: int, y: int, name: str, image: pygame.image):
-        super().__init__(x, y, name)
+    def __init__(self, x: int, y: int, info: Any, image: pygame.image):
+        super().__init__(x, y, info)
         self.image = image
-        self.info = name
         self.rect = self.image.get_rect()
         self.rect.topleft = (x, y)
 

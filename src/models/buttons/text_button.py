@@ -1,11 +1,12 @@
-from src.models.buttons.button import Button
 import pygame
+from src.models.buttons.button import Button
 from src.misc.constants import GRAY, RED, color
+from typing import Any
 
 
 class TextButton(Button):
-    def __init__(self, x: int, y: int, name: str, width: int, height: int, text: str, text_size: int):
-        super().__init__(x, y, name)
+    def __init__(self, x: int, y: int, info: Any, width: int, height: int, text: str, text_size: int):
+        super().__init__(x, y, info)
         self.rect = pygame.Rect(x, y, width, height)
         self.text_size = text_size
         self.text = text
