@@ -22,7 +22,6 @@ class Player(Sprite):
     def move(self, x: int, y: int, city: str):
         self.rect.center = (x + 5 + self.offset_by_x, y - 25)
         self.location = city
-        self.moves -= 1
 
     def draw(self, cards: list[EventCard | CityCard]):
         self.cards.extend(cards)
@@ -34,9 +33,9 @@ class Player(Sprite):
     def replenish_moves(self):
         self.moves = 4
 
-    def has(self, city_name: str) -> bool:
+    def has(self, card_name: str) -> bool:
         for card in self.cards:
-            if card.name == city_name:
+            if card.name == card_name:
                 return True
 
         return False

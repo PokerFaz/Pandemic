@@ -28,7 +28,8 @@ class Game:
         self.infection_deck: InfectionDeck = InfectionDeck({})
         self.infection_discard_pile: InfectionDeck = InfectionDeck({})
         self.current_player: Player = Player()
-        self.players = Group()
+        self.players: Group[Player] = Group()
+        self.skip_next_infection_step = False
 
     def setup(self, log: Deque[str]):
         # CREATING THE CITY GRAPH IN THE BOARD
@@ -70,7 +71,9 @@ class Game:
 
     def initial_infection(self, log: Deque[str]):
         target_cities = self.infection_deck.top_n_cards(9)
-        self.infection_discard_pile.add_cards(target_cities)
+        reversed_cards = target_cities
+        reversed_cards.reverse()
+        self.infection_discard_pile.add_cards(reversed_cards)
 
         for i in range(9):
             city_color = from_color_to_str(self.board.cities[target_cities[i].name].color)
@@ -82,7 +85,7 @@ class Game:
     def initial_draw(self, log: Deque[str]):
 
         n = 4 if int(self.player_count) == 2 else (3 if int(self.player_count) == 3 else 2)
-
+        n = 7
         for player in self.players:
             drawn_cards = self.player_deck.get_cards(n)
             log.append(f"{player.name} drew {[card.name for card in drawn_cards]}")
@@ -155,6 +158,7 @@ class Game:
 
         if can_move:
             self.current_player.move(target_city.x, target_city.y, target_city_name)
+            self.current_player.moves -= 1
             log.append(f"{self.current_player.name} moved to {target_city_name}")
 
     def add_research_station(self):
@@ -163,7 +167,6 @@ class Game:
     def build_research_station(self, city: City, log: Deque[str]):
         city.has_research_station_ = True
         log.append(f"{city.name} now has a research station")
-        self.current_player.moves -= 1
         self.research_station_count -= 1
 
     def calculate_diseases_to_remove(self, color: str) -> int:
@@ -232,28 +235,6 @@ class Game:
     def skip(self):
         self.current_player.moves = 0
 
-    def end_turn(self, log: Deque[str]):
-        self.current_player.replenish_moves()
-
-        drawn_cards = self.player_deck.get_cards(2)
-        log.append(f"{self.current_player.name} drew {[card.name for card in drawn_cards]}")
-
-        for card in drawn_cards:
-            if isinstance(card, EpidemicCard):
-                log.append(f"Resolving epidemic card:")
-                self.resolve_epidemic_card(log)
-                drawn_cards.remove(card)
-            else:
-                self.current_player.draw([card])
-
-        counter = self.board.infection_rate_counter
-        cards_to_take = 2 if counter < 3 else (3 if counter < 5 else 4)
-        drawn_cards = self.infection_deck.top_n_cards(cards_to_take)
-
-        for card in drawn_cards:
-            target_city = self.board.cities[card.name]
-            self.infect(target_city, from_color_to_str(target_city.color), 1, log)
-
     def start_outbreak(self, city_name: str, color: str):
         """
         Simulates the spread of outbreaks.
@@ -275,6 +256,7 @@ class Game:
             for neighbor in self.board.graph.neighbors(current_city):
                 if neighbor not in had_an_outbreak:
                     had_outbreak = self.board.cities[neighbor].add_diseases(1, color)
+                    self.disease_info[color][0] -= 1
                     if had_outbreak:
                         to_outbreak.append(neighbor)
                         had_an_outbreak.append(neighbor)
@@ -293,6 +275,7 @@ class Game:
         if self.did_win():
             return "Win"
         elif self.did_lose():
+            print("hi")
             return "Defeat"
 
         return "No"

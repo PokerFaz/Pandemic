@@ -1,14 +1,18 @@
+import random
 from src.models.decks.deck import Deck
 from src.models.city import City
 from src.models.card import CityCard, EpidemicCard, EventCard
-import random
 from src.misc.utility import load_image
+from src.misc.constants import EVENT_CARDS_NAMES
+from src.misc.images import event_card_images
 
 
 class PlayerDeck(Deck):
     def __init__(self, cities: dict[str: City]):
         super().__init__()
-        self.deck: list[EventCard | CityCard | EpidemicCard] = [CityCard(city, load_image(city.image)) for city in cities.values()]
+        cards: list[EventCard | CityCard | EpidemicCard] = [CityCard(city, load_image(city.image)) for city in cities.values()]
+        cards.extend([EventCard(name, event_png) for name, event_png in zip(EVENT_CARDS_NAMES, event_card_images)])
+        self.deck: list[EventCard | CityCard | EpidemicCard] = cards
 
     # ADDS EPIDEMIC CARDS TO THE PLAYER DECK BASED ON THE DIFFICULTY
     def prepare_deck(self, difficulty: str):

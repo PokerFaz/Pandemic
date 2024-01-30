@@ -4,11 +4,18 @@ from pygame import Surface
 from src.models.buttons.button import Button
 from src.models.buttons.image_button import ImageButton
 from src.models.buttons.text_button import TextButton
+from src.models.city import City
 from src.models.card import CityCard, EventCard
-from src.misc.utility import resize, my_enumerate
+from src.misc.utility import load_image, resize, my_enumerate
 
 
 class ButtonFactory:
+
+    @staticmethod
+    def create_yes_no_buttons() -> list[TextButton]:
+        yes_button = TextButton(WIDTH / 1.8 - 70, HEIGHT / 2 + 20, "yes", 50, 30, "Yes", 40)
+        no_button = TextButton(WIDTH - WIDTH / 1.8 - 70, HEIGHT / 2 + 20, "no", 50, 30, "No", 40)
+        return [yes_button, no_button]
 
     @staticmethod
     def create_starting_screen_button() -> TextButton:
@@ -85,14 +92,21 @@ class ButtonFactory:
         return result_hand_button
 
     @staticmethod
-    def create_city_buttons(player_cards: list[CityCard | EventCard], new_x: float = 180, new_y: float = 250,
-                            per_row: int = -1) -> list[ImageButton]:
+    def create_player_hand_buttons(player_cards: list[CityCard | EventCard], new_x: float = 180, new_y: float = 250,
+                                   per_row: int = -1) -> list[ImageButton]:
         x = 5
         city_buttons = [
             ImageButton(x + 190 * index, 550 - counter * (new_y + 40), card, image=resize(card.image, new_x, new_y))
             for counter, index, card in my_enumerate(player_cards, per_row)]
 
         return city_buttons
+
+    def create_hand_menu_buttons(self, player_cards: list[CityCard | EventCard], action: str) -> list[Button]:
+        buttons: list[Button] = self.create_player_hand_buttons(player_cards)
+        if action == "Hand":
+            buttons.append(TextButton(1320, 650, "event", 178, 50, "Show event cards", 30))
+
+        return buttons
 
     @staticmethod
     def create_disease_removal_options_buttons(available_choices: list[tuple[str, int]]) -> list[TextButton]:
@@ -119,14 +133,31 @@ class ButtonFactory:
         return player_buttons
 
     def create_cure_buttons(self, player_cards: list[CityCard | EventCard]) -> list[Button]:
-        city_buttons: list[Button] = self.create_city_buttons(player_cards)
+        city_buttons: list[Button] = self.create_player_hand_buttons(player_cards)
         cure_button = TextButton(1400, 650, "cure", 100, 55, "CURE", 40)
         city_buttons.append(cure_button)
         return city_buttons
 
     def create_remove_menu_buttons(self, player_cards: list[CityCard | EventCard], per_row: int) -> list[Button]:
-        city_buttons: list[Button] = self.create_city_buttons(player_cards, per_row=per_row)
+        city_buttons: list[Button] = self.create_player_hand_buttons(player_cards, per_row=per_row)
         print(player_cards)
         remove_button = TextButton(1350, 650, "remove", 120, 55, "REMOVE", 40)
         city_buttons.append(remove_button)
         return city_buttons
+
+    @staticmethod
+    def create_forecast_buttons(infection_cards: list[City]) -> list[Button]:
+        starting_x = 5
+        forecast_buttons: list[Button] = [ImageButton(starting_x + index * 190, 500, card, load_image(card.image)) for index, card in enumerate(infection_cards)]
+        forecast_buttons.append(TextButton(1300, 600, "ready", 100, 50, "Ready", 40))
+
+        return forecast_buttons
+
+    @staticmethod
+    def create_rp_buttons(infection_card_names: list[str]) -> list[TextButton]:
+        starting_x = 5
+        starting_y = 5
+        result = [TextButton(starting_x + index * 210, starting_y + counter * 55, name, 190, 50, name, 30)
+                  for counter, index, name in my_enumerate(infection_card_names, 7)]
+
+        return result

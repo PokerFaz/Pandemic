@@ -10,6 +10,12 @@ earth = pygame.image.load(os.path.join("assets", "Starting.png"))
 earth = pygame.transform.scale(earth, (WIDTH, HEIGHT))
 back_image = pygame.image.load(os.path.join("assets", "BackOfRole.png"))
 
+disease_size = (30, 30)
+blue_disease = pygame.transform.scale(pygame.image.load(os.path.join("assets", "blue_disease.png")), disease_size)
+red_disease = pygame.transform.scale(pygame.image.load(os.path.join("assets", "red_disease.png")), disease_size)
+black_disease = pygame.transform.scale(pygame.image.load(os.path.join("assets", "b_disease.png")), disease_size)
+yellow_disease = pygame.transform.scale(pygame.image.load(os.path.join("assets", "yellow_disease.png")), disease_size)
+
 role_1 = pygame.image.load(os.path.join("assets", "Scientist.png"))
 role_2 = pygame.image.load(os.path.join("assets", "Researcher.png"))
 role_3 = pygame.image.load(os.path.join("assets", "OperationsExpert.png"))
@@ -35,3 +41,5 @@ flask = pygame.image.load(os.path.join("assets", "flask.png"))
 flask_image = pygame.transform.scale(flask, (140, 140))
 exchange = pygame.image.load(os.path.join("assets", "exchange.png"))
 exchange_image = pygame.transform.scale(exchange, (180, 180))
+event_pngs = ["OneQuietNight_E.png", "ResilientPopulation_E.png", "Airlift_E.png", "Forecast_E.png", "GovernmentGrant_E.png"]
+event_card_images = [pygame.image.load(os.path.join("assets", event_png)) for event_png in event_pngs]

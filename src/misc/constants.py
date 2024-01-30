@@ -25,3 +25,5 @@ text_y = 710
 action_names = [("Hand", text_size, 315, text_y, BLACK), ("Build", text_size, 530, text_y, BLACK),
                 ("Treat", text_size, 755, text_y, BLACK), ("Cure", text_size, 960, text_y, BLACK),
                 ("Share", text_size, 1132, text_y, BLACK), ("Skip", text_size, 1300, text_y, BLACK)]
+
+EVENT_CARDS_NAMES = ["One quiet night", "Resilient population", "Airlift", "Forecast", "Government grant"]
