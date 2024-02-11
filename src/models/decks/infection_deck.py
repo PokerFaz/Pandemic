@@ -13,10 +13,3 @@ class InfectionDeck(Deck):
 
     def __str__(self) -> str:
         return str([card.name for card in self.deck])
-
-    def get_bottom_card(self) -> InfectionCard:
-        return self.deck.pop()
-
-    def add_to_front(self, cards: list[InfectionCard]):
-        cards.extend(self.deck)
-        self.deck = cards

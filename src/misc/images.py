@@ -2,6 +2,7 @@ import os
 import pygame
 from src.misc.constants import WIDTH, HEIGHT
 
+
 background = pygame.image.load(os.path.join("assets", "PandemicMapV2.png"))
 background = pygame.transform.scale(background, (WIDTH, HEIGHT))
 logo = pygame.image.load(os.path.join("assets", "PandemicLogo.png"))
@@ -9,11 +10,11 @@ logo = pygame.transform.scale(logo, (600, 300))
 earth = pygame.image.load(os.path.join("assets", "Starting.png"))
 earth = pygame.transform.scale(earth, (WIDTH, HEIGHT))
 back_image = pygame.image.load(os.path.join("assets", "BackOfRole.png"))
-
+infection_card_image = pygame.transform.scale(pygame.image.load(os.path.join("assets", "Infection_card_back.png")), (120, 164))
 disease_size = (30, 30)
 blue_disease = pygame.transform.scale(pygame.image.load(os.path.join("assets", "blue_disease.png")), disease_size)
 red_disease = pygame.transform.scale(pygame.image.load(os.path.join("assets", "red_disease.png")), disease_size)
-black_disease = pygame.transform.scale(pygame.image.load(os.path.join("assets", "b_disease.png")), disease_size)
+black_disease = pygame.transform.scale(pygame.image.load(os.path.join("assets", "black_disease.png")), disease_size)
 yellow_disease = pygame.transform.scale(pygame.image.load(os.path.join("assets", "yellow_disease.png")), disease_size)
 
 role_1 = pygame.image.load(os.path.join("assets", "Scientist.png"))
@@ -25,11 +26,11 @@ role_6 = pygame.image.load(os.path.join("assets", "Medic.png"))
 role_7 = pygame.image.load(os.path.join("assets", "QuarantineSpecialist.png"))
 role_1_pin = pygame.image.load(os.path.join("assets", "GrayPin.png"))
 role_2_pin = pygame.image.load(os.path.join("assets", "BrownPin.png"))
-role_3_pin = pygame.image.load(os.path.join("assets", "DarkGreenPin.png"))
+role_3_pin = pygame.image.load(os.path.join("assets", "Pin.png"))
 role_4_pin = pygame.image.load(os.path.join("assets", "TealPin.png"))
 role_5_pin = pygame.image.load(os.path.join("assets", "PinkPin.png"))
 role_6_pin = pygame.image.load(os.path.join("assets", "OrangePin.png"))
-role_7_pin = pygame.image.load(os.path.join("assets", "Pin.png"))
+role_7_pin = pygame.image.load(os.path.join("assets", "DarkGreenPin.png"))
 
 epidemic_image = pygame.image.load(os.path.join("assets", "Epidemic_P.png"))
 back_of_cities = pygame.image.load(os.path.join("assets", "Cities/BackOfCity.png"))

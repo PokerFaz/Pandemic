@@ -5,6 +5,13 @@ from src.models.city import City
 
 class Card:
     def __init__(self, card_type: str, name: str):
+        """
+        Initializes a card
+
+        :param card_type: the type of the card
+        :param name: name of the card
+        """
+
         self.card_type = card_type
         self.name = name
 
@@ -13,6 +20,7 @@ class Card:
 
 
 class CityCard(Card):
+
     def __init__(self, city: City, image: Surface):
         super().__init__("City Card", city.name)
         self.image = image
@@ -20,17 +28,20 @@ class CityCard(Card):
 
 
 class EpidemicCard(Card):
+
     def __init__(self):
         super().__init__("Epidemic Card", "Epidemic card")
         self.image = epidemic_image
 
 
 class EventCard(Card):
+
     def __init__(self, name: str, image: Surface):
         super().__init__("Event Card", name)
         self.image = image
 
 
 class InfectionCard(Card):
+
     def __init__(self, city: City):
         super().__init__("Infection Card", city.name)

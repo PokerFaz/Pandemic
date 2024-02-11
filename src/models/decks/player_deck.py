@@ -9,13 +9,25 @@ from src.misc.images import event_card_images
 
 class PlayerDeck(Deck):
     def __init__(self, cities: dict[str: City]):
+        """
+        Initializes player deck
+
+        :param cities: for making the city cards
+        """
+
         super().__init__()
         cards: list[EventCard | CityCard | EpidemicCard] = [CityCard(city, load_image(city.image)) for city in cities.values()]
         cards.extend([EventCard(name, event_png) for name, event_png in zip(EVENT_CARDS_NAMES, event_card_images)])
         self.deck: list[EventCard | CityCard | EpidemicCard] = cards
 
-    # ADDS EPIDEMIC CARDS TO THE PLAYER DECK BASED ON THE DIFFICULTY
     def prepare_deck(self, difficulty: str):
+        """
+        Adds the epidemic cards to the player deck
+
+        :param difficulty: board's difficulty
+        :return: nothing
+        """
+
         number_of_epidemic_cards = 4 if difficulty == "EASY" else (5 if difficulty == "NORMAL" else 6)
         cards_per_deck = int(len(self.deck) / number_of_epidemic_cards)
         epidemic_card = EpidemicCard()
@@ -33,7 +45,3 @@ class PlayerDeck(Deck):
 
         self.deck = result
 
-    def get_cards(self, number: int) -> list[EventCard | CityCard | EpidemicCard]:
-        result = [city for city in self.deck[:number]]
-        self.remove_top_cards(number)
-        return result

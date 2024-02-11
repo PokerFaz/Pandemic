@@ -1,6 +1,7 @@
 from pygame.sprite import Sprite
 from pygame import Surface
 from src.misc.images import back_image
+from src.misc.constants import STARTING_LOCATION
 from src.models.card import EventCard, CityCard
 
 
@@ -8,7 +9,7 @@ class Player(Sprite):
     def __init__(self, name: str = "", player_image: Surface = back_image, x: int = 0, y: int = 0, offset_by_x: int = 0):
         Sprite.__init__(self)
         self.name = name
-        self.location = "Atlanta"
+        self.location = STARTING_LOCATION
         self.cards: list[EventCard, CityCard] = []
         self.image = player_image
         self.rect = self.image.get_rect()
@@ -26,7 +27,10 @@ class Player(Sprite):
     def draw(self, cards: list[EventCard | CityCard]):
         self.cards.extend(cards)
 
-    def remove_cards(self, cards: list[EventCard | CityCard]):
+    def remove_cards(self, cards: list[EventCard | CityCard] | EventCard | CityCard):
+        if not isinstance(cards, list):
+            cards = [cards]
+
         for card in cards:
             self.cards.remove(card)
 
