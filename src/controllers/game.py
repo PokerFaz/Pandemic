@@ -360,7 +360,7 @@ class Game:
         log.append(f"{city.name} now has a research station")
         self.research_station_count -= 1
 
-    def calculate_diseases_to_remove(self, color: str) -> int:
+    def calculate_diseases_to_remove(self, color: str, city: City) -> int:
         """
         Returns how much disease cubes should be removed
 
@@ -369,9 +369,9 @@ class Game:
         """
         is_disease_cured = self.disease_info[color][1]
         if is_disease_cured:
-            return 3
+            return city.diseases[color]
         elif self.current_player.name == "Medic":
-            return 3
+            return city.diseases[color]
         return 1
 
     def treat(self, color: str, log: Deque[str]):
@@ -382,9 +382,8 @@ class Game:
         :param log: logging the information
         :return: nothing
         """
-
-        to_remove = self.calculate_diseases_to_remove(color)
         player_location = self.current_player.location
+        to_remove = self.calculate_diseases_to_remove(color, self.board.cities[player_location])
 
         self.board.cities[player_location].remove_diseases(to_remove, color)
         log.append(
