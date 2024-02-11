@@ -224,7 +224,7 @@ class ButtonFactory:
         """
 
         city_buttons: list[Button] = self.create_player_hand_buttons(player_cards, per_row=per_row)
-        print(player_cards)
+
         remove_button = TextButton(1350, 650, "remove", 120, 55, "REMOVE", 40)
         city_buttons.append(remove_button)
         return city_buttons

@@ -880,6 +880,7 @@ class GUI:
         # IF THERE IS ONLY 1 DISEASE IN A CITY
         if len(diseases) == 1:
             game.treat(diseases[0][0], self.log_history)
+            game.played_action(game.current_player)
         # IF THERE ARE MORE, THE USER CHOOSES ONE
         else:
 
@@ -899,6 +900,7 @@ class GUI:
 
             if result:
                 game.treat(result, self.log_history)
+                game.played_action(game.current_player)
 
     def write_number(self, number: str, button: Button, size: int = 70):
         offset_x = 85
@@ -1519,7 +1521,7 @@ class GUI:
                     # ACTIONS POSSIBLE WITH MENU ON
                     else:
                         if not self.is_outside_of_menu(mouse_y):
-                            print(1)
+
                             self.handle_actions_with_menu(button_factory, game, mouse_x, mouse_y)
 
                         self.display_current_state(game)

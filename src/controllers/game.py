@@ -71,7 +71,7 @@ class Game:
 
         # ADD THE EPIDEMIC CARDS
         self.decks.prepare_player_deck(self.difficulty)
-        print(self.decks.infection_deck)
+
 
     def setup_board(self):
         """
@@ -145,7 +145,7 @@ class Game:
         """
 
         n = 4 if int(self.player_count) == 2 else (3 if int(self.player_count) == 3 else 2)
-        n=7
+
         for player in self.players:
             drawn_cards = self.decks.player_deck.top_n_cards(n)
             log.append(f"{player.name} drew {[card.name for card in drawn_cards]}")
@@ -393,7 +393,6 @@ class Game:
         if self.disease_info[color][0] == 24 and self.is_disease_cured(color):
             self.disease_info[color][2] = True
 
-        self.played_action(self.current_player)
 
     def cure(self, color: str, log: Deque[str]):
         """
@@ -500,12 +499,11 @@ class Game:
         while to_outbreak:
             self.board.outbreaks_counter += 1
             current_city = to_outbreak.popleft()
-
             for neighbor in self.board.get_neighbors(current_city):
                 if not (neighbor.name in cities_that_had_outbreak or
                         neighbor.is_protected or
                         self.is_disease_eradicated(from_color_to_str(neighbor.color))):
-                    had_outbreak = neighbor.add_diseases(1, color)
+                    had_outbreak = neighbor.add_diseases(1, from_color_to_str(self.board.cities[current_city].color))
                     self.disease_info[color][0] -= 1
                     if had_outbreak:
                         to_outbreak.append(neighbor.name)
