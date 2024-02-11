@@ -1041,6 +1041,9 @@ class GUI:
                 ordered_cards = self.handle_forecast(button_factory, game)
                 ordered_infection_cards = [InfectionCard(elem) for elem in ordered_cards]
                 game.decks.infection_deck.add_to_front(ordered_infection_cards)
+
+                self.display_current_state(game)
+                pygame.display.flip()
             case "Government grant":
                 self.display_current_state(game)
                 pygame.display.flip()
@@ -1068,7 +1071,9 @@ class GUI:
             mouse_x, mouse_y = self.get_next_input(screen_copy, game.players)
             pressed_button = self.find_pressed_button(mouse_x, mouse_y, event_cards_buttons, {})
 
-            self.is_outside_of_menu(mouse_y)
+            if self.is_outside_of_menu(mouse_y):
+                break
+
             if pressed_button is not None:
                 self.play_event_card(pressed_button.info.name, game, button_factory)
 
@@ -1078,6 +1083,7 @@ class GUI:
                         self.log_history.append(f"{player.name} used {pressed_button.info.name}")
 
                 game.decks.players_discard_pile.add_cards([pressed_button.info])
+                break
 
     def pick_event_card(self, game: Game, button_factory: ButtonFactory):
         """

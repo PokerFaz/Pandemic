@@ -102,7 +102,7 @@ class Game:
         :param log: logging the information
         :return: nothing
         """
-        print(2)
+
         if target_city.is_protected or self.is_protected_by_medic(target_city, color):
             log.append(f"{target_city.name} was protected")
         elif self.is_disease_eradicated(color):
@@ -145,7 +145,7 @@ class Game:
         """
 
         n = 4 if int(self.player_count) == 2 else (3 if int(self.player_count) == 3 else 2)
-
+        n=7
         for player in self.players:
             drawn_cards = self.decks.player_deck.top_n_cards(n)
             log.append(f"{player.name} drew {[card.name for card in drawn_cards]}")
