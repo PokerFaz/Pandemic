@@ -460,18 +460,18 @@ class Game:
 
         self.increase_infection_marker()
         log.append(f"Infection marker increased to: {self.board.infection_rate_counter}")
-
+        print(1)
         card = self.decks.infection_deck.get_bottom_card()
         to_be_infected_city = self.board.cities[card.name]
         color = from_color_to_str(to_be_infected_city.color)
         self.infect(to_be_infected_city, color, 3, log)
-
+        print(2)
         self.decks.infection_discard_pile.add_cards([card])
-
+        print(3)
         self.decks.infection_discard_pile.shuffle()
         self.decks.infection_deck.add_to_front([card for card in self.decks.infection_discard_pile])
         self.decks.infection_discard_pile.deck.clear()
-
+        print(4)
     def skip(self):
         """
         Player skips his turn

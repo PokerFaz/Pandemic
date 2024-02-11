@@ -746,10 +746,15 @@ class GUI:
         """
 
         picked_buttons: list[ImageButton] = []
-        self.display_action_menu()
+        text = [(f"Pick {4 if game.current_player.name == 'Scientist' else 5} same-colored cards", 35, (c.WIDTH / 3 + 30, 510),
+                 c.BLACK)]
+
         while True:
-            self.display_contents_on_menu_screen(buttons, modifications)
+            self.display_current_state(game)
+            self.display_action_menu(300)
+            self.display_contents_on_menu_screen(buttons, modifications, text)
             pygame.display.flip()
+
             screen_copy = self.screen.copy()
 
             mouse_x, mouse_y = self.get_next_input(screen_copy, game.players)
@@ -1422,7 +1427,7 @@ class GUI:
                 target_city = game.board.cities[card.name]
                 game.infect(target_city, from_color_to_str(target_city.color), 1, self.log_history)
 
-                game.decks.infection_discard_pile.add_cards([card])
+                game.decks.infection_discard_pile.add_cards(card)
 
             game.current_player.replenish_moves()
         game.skip_next_infection_step = False
@@ -1498,6 +1503,9 @@ class GUI:
                         player.link = player
 
                     self.action_button_list.append(TextButton(100, 600, "Special", 150, 50, "Special action", 30))
+
+                if player.name == "Medic":
+                    game.check_for_automatic_treat(self.log_history)
 
                 game.current_player = player
                 self.display_current_state(game)
