@@ -143,9 +143,9 @@ class GUI:
         """
 
         def required_number_of_cards() -> int:
-            expected_number_of_cards = 3
+            expected_number_of_cards = 5
             if game.current_player.name == "Scientist":
-                expected_number_of_cards = 2
+                expected_number_of_cards = 4
 
             return expected_number_of_cards
 
@@ -558,12 +558,13 @@ class GUI:
         self.display_contents_on_menu_screen(cards, {})
         pygame.display.flip()
 
-    def ask_player_to_use_event_card(self, button_factory: ButtonFactory, game: Game):
+    def ask_player_to_use_event_card(self, button_factory: ButtonFactory, game: Game, text: str):
         """
         Asks the player whether they want to use an event card
 
         :param button_factory: for creating the yes/no buttons
         :param game: getting the game's attributes
+        :param text: what will be the next action
         :return: nothing
         """
 
@@ -575,7 +576,8 @@ class GUI:
 
         self.display_action_menu(menu_height)
         self.display_contents_on_menu_screen(yes_no_buttons, {}, [
-            ("Do you want to use an event card?", text_size, (text_x, text_y), c.RED)])
+            ("Do you want to use an event card?", text_size, (text_x, text_y), c.RED),
+            (text, text_size, (text_x, text_y - 100))])
         pygame.display.flip()
 
         while True:
@@ -610,9 +612,9 @@ class GUI:
 
         self.display_action_menu(menu_height)
         picked_buttons: list[ImageButton] = []
-
+        text = [(f"Remove {difference} {'cards' if difference == 2 else 'card'}", 50, (1000, 400), c.BLACK)]
         while True:
-            self.display_contents_on_menu_screen(buttons, modifications)
+            self.display_contents_on_menu_screen(buttons, modifications, text)
             pygame.display.flip()
             screen_copy = self.screen.copy()
 
@@ -1353,9 +1355,9 @@ class GUI:
                 screen_copy = self.screen.copy()
                 mouse_x, mouse_y = self.get_next_input(screen_copy, game.players)
             else:
+
                 match pressed_button.info:
                     case "Hand":
-                        print(1)
                         self.handle_hand_action(button_factory, game)
                     case "Build":
                         self.handle_build_action(button_factory, game)
@@ -1409,7 +1411,7 @@ class GUI:
         if not game.skip_next_infection_step:
 
             for card in drawn_cards:
-                self.ask_player_to_use_event_card(button_factory, game)
+                self.ask_player_to_use_event_card(button_factory, game, "Before seeing the next infected city")
 
                 self.display_current_state(game)
                 pygame.display.flip()
@@ -1434,9 +1436,9 @@ class GUI:
         """
 
         drawn_cards = game.decks.player_deck.top_n_cards(2)
-        self.log_history.append(f"{game.current_player.name} drew {[card.name for card in drawn_cards]}")
 
-        self.ask_player_to_use_event_card(button_factory, game)
+        self.ask_player_to_use_event_card(button_factory, game, "Before drawing 2 cards")
+        self.log_history.append(f"{game.current_player.name} drew {[card.name for card in drawn_cards]}")
 
         self.display_current_state(game)
         pygame.display.flip()
@@ -1444,8 +1446,6 @@ class GUI:
 
         for card in drawn_cards:
             if isinstance(card, EpidemicCard):
-                self.ask_player_to_use_event_card(button_factory, game)
-
                 self.log_history.append("Resolving epidemic card:")
                 game.resolve_epidemic_card(self.log_history)
                 drawn_cards.remove(card)
@@ -1500,6 +1500,7 @@ class GUI:
                 game.current_player = player
                 self.display_current_state(game)
                 while player.moves > 0:
+
                     pygame.display.flip()
 
                     screen_copy = self.screen.copy()
@@ -1517,24 +1518,23 @@ class GUI:
                             self.display_current_state(game)
                     # ACTIONS POSSIBLE WITH MENU ON
                     else:
-                        if mouse_y in range(540, 800):
+                        if not self.is_outside_of_menu(mouse_y):
+                            print(1)
                             self.handle_actions_with_menu(button_factory, game, mouse_x, mouse_y)
 
                         self.display_current_state(game)
                         self.action_menu_open = False
 
-                end_state = game.did_end()
-                if end_state != "No":
-                    self.display_end_screen(end_state)
-                    pygame.display.flip()
-                    while True:
-                        d = self.get_next_input(self.screen, game.players)
+                    if game.did_win():
+                        self.display_end_screen("Win")
+                        pygame.display.flip()
+                        while True:
+                            d = self.get_next_input(self.screen, game.players)
 
                 self.end_turn(button_factory, game)
 
-                end_state = game.did_end()
-                if end_state != "No":
-                    self.display_end_screen(end_state)
+                if game.did_lose():
+                    self.display_end_screen("Defeat")
                     pygame.display.flip()
                     while True:
                         d = self.get_next_input(self.screen, game.players)

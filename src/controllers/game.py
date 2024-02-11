@@ -255,18 +255,17 @@ class Game:
 
         return False
 
-    def check_for_automatic_treat(self, city: City):
+    def check_for_automatic_treat(self, log: Deque):
         """
         Checks for the medic special ability -> automatic treat.
         If a disease is cured, the medic removes all cubes from the city
 
-        :param city: the city where the medic moves to
         :return: nothing
         """
 
         for color, (number, is_cured, is_eradicated) in self.disease_info.items():
             if is_cured:
-                city.remove_diseases(3, color)
+                self.treat(color, log)
 
     @staticmethod
     def played_action(player: Player):
@@ -329,7 +328,7 @@ class Game:
             self.current_player.move(target_city.x, target_city.y, target_city_name)
 
             if self.current_player.name == "Medic":
-                self.check_for_automatic_treat(target_city)
+                self.check_for_automatic_treat(log)
             elif self.current_player.name == "Quarantine Specialist":
                 for neighbor in self.board.get_neighbors(self.current_player.location):
 
@@ -539,17 +538,3 @@ class Game:
             did_lose = True
 
         return did_lose
-
-    def did_end(self) -> str:
-        """
-        Checks if the game has ended
-
-        :return: Win if the players won, Defeat if they lost or No if the game hasn't ended
-        """
-
-        if self.did_win():
-            return "Win"
-        elif self.did_lose():
-            return "Defeat"
-
-        return "No"
