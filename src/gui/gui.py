@@ -1538,8 +1538,9 @@ class GUI:
                     if game.did_win():
                         self.display_end_screen("Win")
                         pygame.display.flip()
-                        while True:
-                            d = self.get_next_input(self.screen, game.players)
+                        pygame.time.wait(200)
+                        run = False
+                        break
 
                 self.end_turn(button_factory, game)
 
@@ -1547,7 +1548,9 @@ class GUI:
                     self.display_end_screen("Defeat")
                     pygame.display.flip()
                     while True:
-                        d = self.get_next_input(self.screen, game.players)
+                        pygame.time.wait(200)
+                        run = False
+                        break
 
                 if len(game.current_player.cards) > c.MAX_NUMBER_OF_CARDS:
                     self.remove_cards_from_player(game.current_player, game, button_factory,
