@@ -15,7 +15,6 @@ class TestOutbreaks(unittest.TestCase):
         new_york = game.board.cities["New York"]
         paris = game.board.cities["Paris"]
 
-
         game.infect(madrid, "Blue", 3, deque())
         game.infect(london, "Blue", 3, deque())
         game.infect(sao_paulo, "Yellow", 3, deque())

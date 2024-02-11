@@ -72,7 +72,6 @@ class Game:
         # ADD THE EPIDEMIC CARDS
         self.decks.prepare_player_deck(self.difficulty)
 
-
     def setup_board(self):
         """
         Prepares the board
@@ -331,7 +330,6 @@ class Game:
                 self.check_for_automatic_treat(log)
             elif self.current_player.name == "Quarantine Specialist":
                 for neighbor in self.board.get_neighbors(self.current_player.location):
-
                     neighbor.is_protected = True
 
             self.played_action(save_player)
@@ -365,6 +363,7 @@ class Game:
         Returns how much disease cubes should be removed
 
         :param color: the disease that will be treated
+        :param city: to get the number of the specific disease
         :return:
         """
         is_disease_cured = self.disease_info[color][1]
@@ -392,7 +391,6 @@ class Game:
 
         if self.disease_info[color][0] == 24 and self.is_disease_cured(color):
             self.disease_info[color][2] = True
-
 
     def cure(self, color: str, log: Deque[str]):
         """
@@ -472,6 +470,7 @@ class Game:
         self.decks.infection_deck.add_to_front([card for card in self.decks.infection_discard_pile])
         self.decks.infection_discard_pile.deck.clear()
         print(4)
+
     def skip(self):
         """
         Player skips his turn
