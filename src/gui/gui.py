@@ -1401,6 +1401,7 @@ class GUI:
         drawn_cards = game.decks.infection_deck.top_n_cards(cards_to_take)
 
         if not game.skip_next_infection_step:
+
             for card in drawn_cards:
                 self.ask_player_to_use_event_card(button_factory, game)
 
@@ -1409,8 +1410,7 @@ class GUI:
                 pygame.time.wait(1000)
 
                 target_city = game.board.cities[card.name]
-                if not target_city.is_protected:
-                    game.infect(target_city, from_color_to_str(target_city.color), 1, self.log_history)
+                game.infect(target_city, from_color_to_str(target_city.color), 1, self.log_history)
 
                 game.decks.infection_discard_pile.add_cards([card])
 
@@ -1449,6 +1449,8 @@ class GUI:
         self.display_current_state(game)
         pygame.display.flip()
         pygame.time.wait(100)
+
+        self.end_turn_infect(game, button_factory)
 
     def initial_protection(self, game: Game):
         """

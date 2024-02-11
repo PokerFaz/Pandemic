@@ -71,6 +71,7 @@ class Game:
 
         # ADD THE EPIDEMIC CARDS
         self.decks.prepare_player_deck(self.difficulty)
+        print(self.decks.infection_deck)
 
     def setup_board(self):
         """
@@ -101,6 +102,7 @@ class Game:
         :param log: logging the information
         :return: nothing
         """
+        print(2)
         if target_city.is_protected or self.is_protected_by_medic(target_city, color):
             log.append(f"{target_city.name} was protected")
         elif self.is_disease_eradicated(color):
