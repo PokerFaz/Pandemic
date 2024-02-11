@@ -6,3 +6,8 @@ Clone the repository or download the zip
 > 
 <br> Run main.py
 > python main.py
+
+## How to run the tests
+Write in the console where u downloaded the game
+> python -m unittest discover -s tests
+
